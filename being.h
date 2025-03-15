@@ -3,6 +3,7 @@
 
 typedef enum heading { UNDERVALUE2 = -2, UNDERVALUE1, UP, UPRIGHT, RIGHT, DOWNRIGHT, DOWN, DOWNLEFT, LEFT, UPLEFT, OVERVALUE1, OVERVALUE2 } Heading;
 typedef enum object { NONE, OTHERBEING, FENCE } Object;
+typedef enum myColor { GREEN = 2, BLUE = 4 } MyColor
 typedef struct sight {
 	 Object leftnear;
 	 Object leftfar; 
@@ -19,7 +20,7 @@ typedef struct being{
 	//Sight peek;
 	Sight obstacles;
 	bool resting;
-	int myColor;
+	MyColor myColor;
 } Being;
 
 

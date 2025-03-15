@@ -1,4 +1,4 @@
-#include <curses.h>
+#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -43,10 +43,10 @@ void look_ahead(Being *beingToTurn)
 
 	/* Being field of view:
 	#####
-	#####	
+	#####
 	##X##
 	#####
-	##### 
+	#####
 	*/
 
 	// Being peeks at surrounding ahead depending on heading.
@@ -117,41 +117,41 @@ void look_ahead(Being *beingToTurn)
 			break;
 		default:
 			break;
-	}	
+	}
 }
 
 void decision(Being *beingToTurn)
 {
 	int i;
-	
+
 	// If movement is stopped, decide start moving or not. *EARLY*
 	if(beingToTurn->resting){
 		if(getRndNum(2)==2){
 			beingToTurn->myHeading = getRndNum(8)-1;
-			beingToTurn->resting = FALSE;	
+			beingToTurn->resting = FALSE;
 		}
-		else 	
+		else
 			return; // No other activity this round if decided to stand still.
-	}	
-	
+	}
+
 	// Look towards path ahead for obstacles.
 	look_ahead(beingToTurn);
-	
+
 	bool firstCheck = TRUE;
-	
+
 	// Keep deciding until the coast is clear.
 	while(firstCheck || (beingToTurn->obstacles.middlenear!=NONE && !beingToTurn->resting)){
-		
+
 		i = getRndNum(16);
-		
+
 		// Try with an entirely new heading by 50% chance if first choice was blocked.
-		if(!firstCheck){ 
+		if(!firstCheck){
 			if(getRndNum(2)==2){
 				beingToTurn->myHeading = getRndNum(8)-1;
 				beingToTurn->resting = FALSE;
 			}
 		}
-		
+
 		// Change behaviour by own will (only one notch).
 		// Turn left by own will.
 		if(i==5)
@@ -162,12 +162,12 @@ void decision(Being *beingToTurn)
 		// Stop by own will.
 		else if(i==16)
 			beingToTurn->resting=TRUE;
-		
+
 		// Look towards path ahead for obstacles.
 		look_ahead(beingToTurn);
-		
+
 		// Handling of other beings *****************************************************************************
-		
+
 		// If another being is far away.
 		if(beingToTurn->obstacles.leftnear==NONE && beingToTurn->obstacles.middlenear==NONE && beingToTurn->obstacles.rightnear==NONE){
 			// being obstacle far left.
@@ -184,47 +184,47 @@ void decision(Being *beingToTurn)
 					beingToTurn->myHeading++;
 			}
 		}
-	
+
 		// Likely stop if another being is close ahead.
 		if(beingToTurn->obstacles.leftnear==OTHERBEING || beingToTurn->obstacles.middlenear==OTHERBEING || beingToTurn->obstacles.rightnear==OTHERBEING){
 			if(getRndNum(4)!=4)
 				beingToTurn->resting = TRUE;
 		}
-			
-		
+
+
 		// ********************************************************************************************************
-	
+
 		// Look towards path ahead for obstacles.
 		look_ahead(beingToTurn);
-	
+
 		// Special handling of fences (outside the standard collision avoidance) **********************************
-	
-		// If fence spotted straight ahead (in the middle) and nothing is closer: 
+
+		// If fence spotted straight ahead (in the middle) and nothing is closer:
 		if(beingToTurn->obstacles.leftfar==NONE && beingToTurn->obstacles.middlenear==NONE && beingToTurn->obstacles.rightnear==NONE){
 			if(beingToTurn->obstacles.middlefar==FENCE){
 				if(beingToTurn->obstacles.rightfar==FENCE && beingToTurn->obstacles.leftfar==NONE)
 					beingToTurn->myHeading--;
-				else if(beingToTurn->obstacles.rightfar==NONE && beingToTurn->obstacles.leftfar==FENCE)	
+				else if(beingToTurn->obstacles.rightfar==NONE && beingToTurn->obstacles.leftfar==FENCE)
 					beingToTurn->myHeading++;
-				else if(beingToTurn->obstacles.rightfar==NONE && beingToTurn->obstacles.leftfar==NONE){	
+				else if(beingToTurn->obstacles.rightfar==NONE && beingToTurn->obstacles.leftfar==NONE){
 					if(getRndNum(2)==1)
 						beingToTurn->myHeading--;
 					else
 						beingToTurn->myHeading++;
 				}
 			}
-			
+
 		}
-		
+
 		// Look towards path ahead for obstacles.
 		look_ahead(beingToTurn);
-		
+
 		// Increase chance of stopping if facing a fence.
 		if(beingToTurn->obstacles.middlenear==FENCE && getRndNum(6)>4)
 			beingToTurn->resting = TRUE;
-			
+
 		// ************************************************************************************************************
-	
+
 		// Look towards path ahead for obstacles.
 		look_ahead(beingToTurn);
 		firstCheck = FALSE;

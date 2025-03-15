@@ -21,4 +21,3 @@ bool checkIfCoordinatesAreClear(const int *x, const int *y);
 
 
 #endif
-

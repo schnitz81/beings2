@@ -1,4 +1,4 @@
-#include <curses.h>
+#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -13,41 +13,41 @@ int maxy;
 void drawOuterWall()
 {
 	int i;
-		
+
 	// upper frame
 	for(i=1;i<maxx-1;i++){
 		move(0,i);
 		printw("=");
 	}
-	
+
 	// lower frame
-	for(i=1;i<maxx-1;i++){ 
+	for(i=1;i<maxx-1;i++){
 		move(maxy-1,i);
 		printw("=");
-	}	
-	
+	}
+
 	// left frame
 	for(i=0;i<maxy;i++){
 		move(i,0);
 		printw("|");
 	}
-		
+
 	// right frame
-	for(i=0;i<maxy;i++){ 
+	for(i=0;i<maxy;i++){
 		move(i,maxx-1);
 		printw("|");
 	}
 	refresh();
 }
 
-	
+
 void placeObstacles()
 {
 	int i, j, y, x, obstacleDensity = -1;
 	bool bLast, bOneMade = FALSE;
-	
+
 	// User chooses obstacle density.
-	
+
 	while(obstacleDensity<0||obstacleDensity>50){
 		mvprintw(maxy-1,(maxx/2)-18," Enter obstacle density (0-50):    ");
 		getyx(stdscr,y,x);
@@ -55,13 +55,13 @@ void placeObstacles()
 		scanw("%d",&obstacleDensity);
 	}
 	drawOuterWall(); // Redraw outer wall.
-	
+
 	// Exit function if obstacle density is 0.
 	if(obstacleDensity==0)
 		return;
 
 	// Generate obstacles
-	
+
 	// X-wise obstacles
 	for(i=1;i<maxy-1;i++){
 		for(j=1;j<maxx-1;j++){
@@ -71,14 +71,14 @@ void placeObstacles()
 				bOneMade = FALSE;
 			}
 			else if(bLast && getRndNum(4)!=1)  // Keep making obstacle longer.
-				mvprintw(i,j,"#");				
+				mvprintw(i,j,"#");
 			else if(getRndNum(1000/obstacleDensity)==1){  // new obstacle
 				mvprintw(i,j,"#");
 				bLast = TRUE;
 				bOneMade = TRUE;
 			}
 			else // Obstacle done
-				bLast = FALSE;	
+				bLast = FALSE;
 			refresh();
 		}
 	}
@@ -124,13 +124,18 @@ void buildWorld()
 }
 
 
-unsigned int getNbrOfBeings()
+unsigned int getNbrOfBeings(MyColor *myColor)
 {
 	unsigned int nbrOfBeings = 0;
 	int y, x;
+	char colorOfBeings;
 	unsigned long long int inputNbr = 0;
+	if(*myColor == GREEN)
+		colorOfBeings = "green";
+	else
+		colorOfBeings = "blue";
 	while(inputNbr<1||inputNbr>9999999999999){
-		mvprintw(maxy-1,(maxx/2)-19," Enter number of beings:            ");
+		mvprintw(maxy-1,(maxx/2)-19," Enter number of %s beings:            ", colorOfBeings);
 		getyx(stdscr,y,x);  // Get current cursor position.
 		move(y,x-12);  // Move back cursor three steps.
 		scanw("%llu",&inputNbr);
@@ -144,14 +149,14 @@ unsigned int getNbrOfBeings()
 }
 
 
-unsigned int spawnBeings(Being *beings, const unsigned int *nbrOfBeings)
-{	
+unsigned int spawnBeings(Being *beings, const unsigned int *nbrOfBeings, const MyColor *beingColor)
+{
 	int i;
 	unsigned int actualNbrOfBeings = 0;
 	bool beingCreated;
 	for(i=0;i<*nbrOfBeings;i++){  // Spawn all beings.
 		usleep(300);  // delay
-		beingCreated = spawnBeing(&beings[i], &i);
+		beingCreated = spawnBeing(&beings[i], &i, &beingColor);
 		if(beingCreated == FALSE){
 			beings = realloc(beings,actualNbrOfBeings*sizeof(Being));
 			break;
@@ -164,7 +169,7 @@ unsigned int spawnBeings(Being *beings, const unsigned int *nbrOfBeings)
 		}
 		refresh();
 	}
-	return actualNbrOfBeings;	
+	return actualNbrOfBeings;
 }
 
 
@@ -187,12 +192,17 @@ void runWorld()
 	unsigned int nbrOfBeings;
 	int i, simulationSpeed, newBeingToSpawnNbr;
 	bool beingCreated;
-	nbrOfBeings = getNbrOfBeings();
-	Being *beings = malloc(nbrOfBeings*sizeof(Being)); 
-	nbrOfBeings = spawnBeings(&*beings,&nbrOfBeings);
+	MyColor beingColor;
+	beingColor = GREEN;
+	nbrOfGreenBeings = getNbrOfBeings('green');
+	Being *greenBeings = malloc(nbrOfGreenBeings*sizeof(Being));
+	nbrOfGreenBeings = spawnBeings(&*beings,&nbrOfGreenBeings,&myColor);
+	beingColor = BLUE;
+	nbrOfBlueBeings = getNbrOfBeings('blue');
+	Being *blueBeings = malloc(nbrOfBlueBeings*sizeof(Being));
+	nbrOfBlueBeings = spawnBeings(&*beings,&nbrOfBlueBeings,&myColor);
 	drawOuterWall();
 	simulationSpeed = setSimulationSpeed();
-	
 	mvprintw(maxy-1,(maxx/2)-19," Press Enter to start simulation. ");
 	getch();
 	drawOuterWall();
@@ -204,13 +214,13 @@ void runWorld()
 		for(i=0;i<nbrOfBeings;i++)
 			turnBeing(&beings[i], &i);
 		refresh();
-		
+
 		// Change simulation speed or number of beings during run.
 		if(ch=='+' && simulationSpeed<100 )
 			simulationSpeed++;
 		else if(ch=='-' && simulationSpeed>1)
 			simulationSpeed--;
-		
+
 		// Create and remove beings during run.
 		if(ch==',' && nbrOfBeings > 1){
 			mvprintw(beings[nbrOfBeings-1].posy,beings[nbrOfBeings-1].posx," ");  // Erase last being.
