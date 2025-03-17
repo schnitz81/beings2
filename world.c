@@ -6,6 +6,7 @@
 //#include <sys/ioctl.h>
 #include "world.h"
 #include "event.h"
+#include "being.h"
 
 int maxx;
 int maxy;
@@ -124,18 +125,20 @@ void buildWorld()
 }
 
 
-unsigned int getNbrOfBeings(MyColor *myColor)
+unsigned int getNbrOfBeings(const MyColor *myColor)
 {
 	unsigned int nbrOfBeings = 0;
 	int y, x;
-	char colorOfBeings;
 	unsigned long long int inputNbr = 0;
-	if(*myColor == GREEN)
-		colorOfBeings = "green";
-	else
-		colorOfBeings = "blue";
+	
 	while(inputNbr<1||inputNbr>9999999999999){
-		mvprintw(maxy-1,(maxx/2)-19," Enter number of %s beings:            ", colorOfBeings);
+		mvprintw(maxy-1,(maxx/2)-19," Enter number of ");
+		// print color of current selection
+		if(*myColor == GREEN)
+			printw("green");
+		else if(*myColor == BLUE)
+			printw("blue");
+		printw(" beings:            ");
 		getyx(stdscr,y,x);  // Get current cursor position.
 		move(y,x-12);  // Move back cursor three steps.
 		scanw("%llu",&inputNbr);
@@ -156,17 +159,17 @@ unsigned int spawnBeings(Being *beings, const unsigned int *nbrOfBeings, const M
 	bool beingCreated;
 	for(i=0;i<*nbrOfBeings;i++){  // Spawn all beings.
 		usleep(300);  // delay
-		beingCreated = spawnBeing(&beings[i], &i, &beingColor);
+		beingCreated = spawnBeing(&beings[i], &i, beingColor);
 		if(beingCreated == FALSE){
 			beings = realloc(beings,actualNbrOfBeings*sizeof(Being));
 			break;
 		}
 		else
 			actualNbrOfBeings++;
-		if(i==0){  // Set special color on genesis being.
-			beings[0].myColor=15;
-			turnBeing(&beings[i], &i);
-		}
+		//if(i==0){  // Set special color on genesis being.
+		//	beings[0].myColor=15;
+		//	turnBeing(&beings[i], &i);
+		//}
 		refresh();
 	}
 	return actualNbrOfBeings;
@@ -189,18 +192,19 @@ int setSimulationSpeed()
 
 void runWorld()
 {
-	unsigned int nbrOfBeings;
-	int i, simulationSpeed, newBeingToSpawnNbr;
-	bool beingCreated;
-	MyColor beingColor;
-	beingColor = GREEN;
-	nbrOfGreenBeings = getNbrOfBeings('green');
+	unsigned int nbrOfGreenBeings, nbrOfBlueBeings;
+	int i, simulationSpeed;
+	// int newBeingToSpawnNbr;  ////////////////////////////////////////////////////////////////  used in create/remove
+	//bool beingCreated;    ////////////////////////////////////////////////////////////////  used in create/remove
+	MyColor greenBeingColor, blueBeingColor;
+	greenBeingColor = GREEN;
+	nbrOfGreenBeings = getNbrOfBeings(&greenBeingColor);
 	Being *greenBeings = malloc(nbrOfGreenBeings*sizeof(Being));
-	nbrOfGreenBeings = spawnBeings(&*beings,&nbrOfGreenBeings,&myColor);
-	beingColor = BLUE;
-	nbrOfBlueBeings = getNbrOfBeings('blue');
+	nbrOfGreenBeings = spawnBeings(&*greenBeings,&nbrOfGreenBeings,&greenBeingColor);
+	blueBeingColor = BLUE;
+	nbrOfBlueBeings = getNbrOfBeings(&blueBeingColor);
 	Being *blueBeings = malloc(nbrOfBlueBeings*sizeof(Being));
-	nbrOfBlueBeings = spawnBeings(&*beings,&nbrOfBlueBeings,&myColor);
+	nbrOfBlueBeings = spawnBeings(&*blueBeings,&nbrOfBlueBeings,&nbrOfBlueBeings);
 	drawOuterWall();
 	simulationSpeed = setSimulationSpeed();
 	mvprintw(maxy-1,(maxx/2)-19," Press Enter to start simulation. ");
@@ -211,8 +215,10 @@ void runWorld()
 	int ch = 0;
 	while(ch != 27){
 		ch=getch();
-		for(i=0;i<nbrOfBeings;i++)
-			turnBeing(&beings[i], &i);
+		for(i=0;i<nbrOfGreenBeings;i++)
+			turnBeing(&greenBeings[i], &i);
+		for(i=0;i<nbrOfBlueBeings;i++)
+			turnBeing(&blueBeings[i], &i);
 		refresh();
 
 		// Change simulation speed or number of beings during run.
@@ -222,24 +228,25 @@ void runWorld()
 			simulationSpeed--;
 
 		// Create and remove beings during run.
-		if(ch==',' && nbrOfBeings > 1){
-			mvprintw(beings[nbrOfBeings-1].posy,beings[nbrOfBeings-1].posx," ");  // Erase last being.
-			nbrOfBeings--;
-			beings = realloc(beings,nbrOfBeings*sizeof(Being));
-		}
-		else if(ch=='.' && nbrOfBeings < 65535){  // Create new being.
-			nbrOfBeings++;
-			beings = realloc(beings,nbrOfBeings*sizeof(Being));
-			newBeingToSpawnNbr = nbrOfBeings - 1;
-			beingCreated = spawnBeing(&beings[newBeingToSpawnNbr], &newBeingToSpawnNbr);
-			if(beingCreated==FALSE){ // If being created is unsuccessful due to out of space.
-				nbrOfBeings--;
-				beings = realloc(beings,nbrOfBeings*sizeof(Being));
-			}
-		}
+		//if(ch==',' && nbrOfBeings > 1){
+		//	mvprintw(beings[nbrOfBeings-1].posy,beings[nbrOfBeings-1].posx," ");  // Erase last being.
+		//	nbrOfBeings--;
+		//	beings = realloc(beings,nbrOfBeings*sizeof(Being));
+		//}
+		//else if(ch=='.' && nbrOfBeings < 65535){  // Create new being.
+		//	nbrOfBeings++;
+		//	beings = realloc(beings,nbrOfBeings*sizeof(Being));
+		//	newBeingToSpawnNbr = nbrOfBeings - 1;
+		//	beingCreated = spawnBeing(&beings[newBeingToSpawnNbr], &newBeingToSpawnNbr);
+		//	if(beingCreated==FALSE){ // If being created is unsuccessful due to out of space.
+		//		nbrOfBeings--;
+		//		beings = realloc(beings,nbrOfBeings*sizeof(Being));
+		//	}
+		//}
 		usleep(1000000/simulationSpeed);
 	}
-	free(beings);
+	free(greenBeings);
+	free(blueBeings);
 	getch();
 	endwin();
 }

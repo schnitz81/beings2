@@ -24,6 +24,7 @@ void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const 
 	beingToGiveLife->resting = TRUE;
 
 	beingToGiveLife->myColor = *myColor;
+	printw("myColor:%s", beingToGiveLife->myColor);
 }
 
 
@@ -49,7 +50,7 @@ int spawnBeing(Being *beingToGiveLife, const int *beingNbr, const MyColor *myCol
 		testy = getRndNum(maxy-1);
 		coordinateIsClear = checkIfCoordinatesAreClear(&testx, &testy);
 	}
-	setBeingDefaults(beingToGiveLife,&testx,&testy,&myColor);
+	setBeingDefaults(beingToGiveLife,&testx,&testy,myColor);
 
 	// Initial placing of being.
 	beingToPrint(beingToGiveLife);

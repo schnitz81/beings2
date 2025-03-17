@@ -14,7 +14,7 @@ void placeObstacles();
 void buildWorld();
 unsigned int getMaxNbrOfBeings();
 unsigned int getNbrOfBeings();
-unsigned int spawnBeings(Being *beings, const unsigned int *nbrOfBeings);
+unsigned int spawnBeings(Being *beings, const unsigned int *nbrOfBeings, const MyColor *beingColor);
 int setSimulationSpeed();
 void runWorld();
 bool checkIfCoordinatesAreClear(const int *x, const int *y);

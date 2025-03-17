@@ -3,7 +3,7 @@
 
 typedef enum heading { UNDERVALUE2 = -2, UNDERVALUE1, UP, UPRIGHT, RIGHT, DOWNRIGHT, DOWN, DOWNLEFT, LEFT, UPLEFT, OVERVALUE1, OVERVALUE2 } Heading;
 typedef enum object { NONE, OTHERBEING, FENCE } Object;
-typedef enum myColor { GREEN = 2, BLUE = 4 } MyColor
+typedef enum myColor { GREEN = 2, BLUE = 4 } MyColor;
 typedef struct sight {
 	 Object leftnear;
 	 Object leftfar; 
@@ -26,9 +26,9 @@ typedef struct being{
 
 /* Function prototypes */
 
-void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y);
+void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const MyColor *myColor);
 void beingToPrint(const Being *beingToPrint);
-int spawnBeing(Being *beingToGiveLife, const int *beingNbr);
+int spawnBeing(Being *beingToGiveLife, const int *beingNbr, const MyColor *myColor);
 void movement(Being *beingToTurn);
 void turnBeing(Being *beingToTurn, const int *beingNbr);
 
