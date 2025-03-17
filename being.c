@@ -12,19 +12,17 @@ void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const 
 	// Initialize values of new being.
 	beingToGiveLife->posx = *x;
 	beingToGiveLife->posy = *y;
+	beingToGiveLife->hitpoints = 5;
 	beingToGiveLife->myHeading = getRndNum(8)-1;
-
 	beingToGiveLife->obstacles.leftfar = 0;
 	beingToGiveLife->obstacles.leftnear = 0;
 	beingToGiveLife->obstacles.middlefar = 0;
 	beingToGiveLife->obstacles.middlenear = 0;
 	beingToGiveLife->obstacles.rightfar = 0;
 	beingToGiveLife->obstacles.rightnear = 0;
-
 	beingToGiveLife->resting = TRUE;
-
 	beingToGiveLife->myColor = *myColor;
-	printw("myColor:%d", beingToGiveLife->myColor);
+	beingToGiveLife->fightevent = NONE;
 }
 
 

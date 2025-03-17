@@ -132,7 +132,7 @@ unsigned int getNbrOfBeings(const MyColor *myColor)
 	unsigned int nbrOfBeings = 0;
 	int y, x;
 	unsigned long long int inputNbr = 0;
-	
+
 	while(inputNbr<1||inputNbr>9999999999999){
 		mvprintw(maxy-1,(maxx/2)-19," Enter number of ");
 		// print color of current selection
@@ -231,7 +231,7 @@ void runWorld()
 			simulationSpeed++;
 		else if(ch=='-' && simulationSpeed>1)
 			simulationSpeed--;
-		
+
 		// Change gamemode
 		else if(ch=='f' || ch=='F')
 			gamemode = FREEROAM;
@@ -239,10 +239,10 @@ void runWorld()
 			gamemode = REGROUP;
 		else if(ch=='a' || ch=='A')
 			gamemode = ATTACK;
-		
-			
-		
-		
+
+
+
+
 		// Create and remove beings during run.
 		//if(ch==',' && nbrOfBeings > 1){
 		//	mvprintw(beings[nbrOfBeings-1].posy,beings[nbrOfBeings-1].posx," ");  // Erase last being.
