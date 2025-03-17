@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include "being.h"
 
+typedef enum gamemode {FREEROAM, REGROUP, ATTACK} Gamemode;
+extern Gamemode gamemode;
 extern int maxx;
 extern int maxy;
 

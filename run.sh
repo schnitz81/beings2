@@ -18,7 +18,7 @@
 	gcc -v -Wfatal-errors -o beings main.o world.o ai.o event.o being.o -lncurses -ltinfo 
 
 	if [ $? -eq 0 ]; then
-		echo "Build successful."; sleep 1
+		echo "Build successful."
 		#./beings
 	else
 		echo "Build failed."

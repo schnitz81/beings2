@@ -11,6 +11,8 @@
 int maxx;
 int maxy;
 
+Gamemode gamemode;
+
 void drawOuterWall()
 {
 	int i;
@@ -134,10 +136,12 @@ unsigned int getNbrOfBeings(const MyColor *myColor)
 	while(inputNbr<1||inputNbr>9999999999999){
 		mvprintw(maxy-1,(maxx/2)-19," Enter number of ");
 		// print color of current selection
+		attron(A_BOLD);
 		if(*myColor == GREEN)
 			printw("green");
 		else if(*myColor == BLUE)
 			printw("blue");
+		attroff(A_BOLD);
 		printw(" beings:            ");
 		getyx(stdscr,y,x);  // Get current cursor position.
 		move(y,x-12);  // Move back cursor three steps.
@@ -197,6 +201,7 @@ void runWorld()
 	// int newBeingToSpawnNbr;  ////////////////////////////////////////////////////////////////  used in create/remove
 	//bool beingCreated;    ////////////////////////////////////////////////////////////////  used in create/remove
 	MyColor greenBeingColor, blueBeingColor;
+	gamemode = FREEROAM;
 	greenBeingColor = GREEN;
 	nbrOfGreenBeings = getNbrOfBeings(&greenBeingColor);
 	Being *greenBeings = malloc(nbrOfGreenBeings*sizeof(Being));
@@ -204,7 +209,7 @@ void runWorld()
 	blueBeingColor = BLUE;
 	nbrOfBlueBeings = getNbrOfBeings(&blueBeingColor);
 	Being *blueBeings = malloc(nbrOfBlueBeings*sizeof(Being));
-	nbrOfBlueBeings = spawnBeings(&*blueBeings,&nbrOfBlueBeings,&nbrOfBlueBeings);
+	nbrOfBlueBeings = spawnBeings(&*blueBeings,&nbrOfBlueBeings,&blueBeingColor);
 	drawOuterWall();
 	simulationSpeed = setSimulationSpeed();
 	mvprintw(maxy-1,(maxx/2)-19," Press Enter to start simulation. ");
@@ -222,11 +227,22 @@ void runWorld()
 		refresh();
 
 		// Change simulation speed or number of beings during run.
-		if(ch=='+' && simulationSpeed<100 )
+		if(ch=='+' && simulationSpeed<100)
 			simulationSpeed++;
 		else if(ch=='-' && simulationSpeed>1)
 			simulationSpeed--;
-
+		
+		// Change gamemode
+		else if(ch=='f' || ch=='F')
+			gamemode = FREEROAM;
+		else if(ch=='r' || ch=='R')
+			gamemode = REGROUP;
+		else if(ch=='a' || ch=='A')
+			gamemode = ATTACK;
+		
+			
+		
+		
 		// Create and remove beings during run.
 		//if(ch==',' && nbrOfBeings > 1){
 		//	mvprintw(beings[nbrOfBeings-1].posy,beings[nbrOfBeings-1].posx," ");  // Erase last being.

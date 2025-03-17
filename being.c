@@ -24,7 +24,7 @@ void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const 
 	beingToGiveLife->resting = TRUE;
 
 	beingToGiveLife->myColor = *myColor;
-	printw("myColor:%s", beingToGiveLife->myColor);
+	printw("myColor:%d", beingToGiveLife->myColor);
 }
 
 
