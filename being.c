@@ -114,3 +114,24 @@ void turnBeing(Being *beingToTurn, const int *beingNbr)
 	// Print new position.
 	beingToPrint(beingToTurn);
 }
+
+
+bool isEnemy(Being *beingMe, const int *targetx, const int *targety)
+{
+	//beingMe->myColor = GREEN
+	char targetobject;
+	char targetcolor;
+	targetobject = mvinch(*targety,*targetx) & A_CHARTEXT;  // Get target object.
+	targetcolor = mvinch(*targety,*targetx) & A_COLOR;  	// Get target color.
+	
+	// Friend or foe
+	if(targetobject == '*'){
+		if(beingMe->myColor == GREEN && targetcolor)
+			return FALSE
+	}
+	else
+		return FALSE
+	
+	
+	
+}
