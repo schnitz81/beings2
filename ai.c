@@ -31,12 +31,16 @@ void look_ahead(Being *beingToTurn)
 	int i,j;
 	for(j=0;j<=4;j++){	// Update obstacles of the current surroundings.
 		for(i=0;i<=4;i++){
-			square = mvinch((beingToTurn->posy-2)+j,(beingToTurn->posx-2)+i) & A_CHARTEXT;  // Get square content.
-			if(square==' ')
+			squareChar = mvinch((beingToTurn->posy-2)+j,(beingToTurn->posx-2)+i) & A_CHARTEXT;  // Get square char.
+			squareCharColor = mvinch((beingToTurn->posy-2)+j,(beingToTurn->posx-2)+i) & A_COLOR;  // Get square char.
+			if(squareChar==' ')
 				surrounding[i][j] = NONE;
-			else if(square=='*')
-				surrounding[i][j] = OTHERBEING;
-			else if(square=='=' || square=='|' || square=='#')
+			else if(squareChar=='*')
+				if(squareCharColor==beingToTurn->myColor)
+					surrounding[i][j] = TEAMBEING;
+				else
+					surrounding[i][j] = ENEMYBEING;
+			else if(squareChar=='=' || squareChar=='|' || squareChar=='#')
 				surrounding[i][j] = FENCE;
 		}
 	}
@@ -172,6 +176,7 @@ void decision(Being *beingToTurn)
 		if(beingToTurn->obstacles.leftnear==NONE && beingToTurn->obstacles.middlenear==NONE && beingToTurn->obstacles.rightnear==NONE){
 			// being obstacle far left.
 			if(beingToTurn->obstacles.leftfar==OTHERBEING && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==NONE)
+				if(beingToTurn)
 				beingToTurn->myHeading++;
 			// being obstacle far right
 			else if(beingToTurn->obstacles.leftfar==NONE && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==OTHERBEING)
