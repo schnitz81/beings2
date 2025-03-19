@@ -22,7 +22,7 @@ void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const 
 	beingToGiveLife->obstacles.rightnear = 0;
 	beingToGiveLife->resting = TRUE;
 	beingToGiveLife->myColor = *myColor;
-	beingToGiveLife->fightevent = NONE;
+	beingToGiveLife->fighting = FALSE;
 }
 
 
@@ -63,7 +63,7 @@ int spawnBeing(Being *beingToGiveLife, const int *beingNbr, const MyColor *myCol
 
 void movement(Being *beingToTurn)
 {
-	if(!beingToTurn->resting){
+	if(!beingToTurn->resting && !beingToTurn->fighting){
 		switch(beingToTurn->myHeading){
 			case UP:
 				beingToTurn->posy--;
@@ -116,16 +116,26 @@ void turnBeing(Being *beingToTurn, const int *beingNbr)
 }
 
 
-bool isEnemy(Being *beingPerspective, const int *targetx, const int *targety)
-{
-	char targetobject;
-	char targetcolor;
-	targetobject = mvinch(*targety,*targetx) & A_CHARTEXT;  // Get target object.
-	targetcolor = mvinch(*targety,*targetx) & A_COLOR;  	// Get target color.
+void strikeBeing(Being *beingToStrike){
+	if(getRndNum(3)==3){
+		beingToStrike->hitpoints--;
+		attron(COLOR_PAIR(beingToPrint->myColor));
+		mvprintw(beingToStrike->posy,beingToStrike->posx,"*");
+		attroff(COLOR_PAIR(beingToPrint->myColor));
+	}
+}
+
+
+//bool isEnemy(Being *beingPerspective, const int *targetx, const int *targety)
+//{
+//	char targetobject;
+//	char targetcolor;
+//	targetobject = mvinch(*targety,*targetx) & A_CHARTEXT;  // Get target object.
+//	targetcolor = mvinch(*targety,*targetx) & A_COLOR;  	// Get target color.
 
 	// Friend or foe
-	if(targetobject == '*' && targetcolor != beingPerspective->myColor)  //being with different color
-		return TRUE;
-	else
-		return FALSE;
-}
+//	if(targetobject == '*' && targetcolor != beingPerspective->myColor)  //being with different color
+//		return TRUE;
+//	else
+//		return FALSE;
+//}

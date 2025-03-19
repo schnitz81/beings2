@@ -4,7 +4,7 @@
 typedef enum heading { UNDERVALUE2 = -2, UNDERVALUE1, UP, UPRIGHT, RIGHT, DOWNRIGHT, DOWN, DOWNLEFT, LEFT, UPLEFT, OVERVALUE1, OVERVALUE2 } Heading;
 typedef enum object { NONE, TEAMBEING, ENEMYBEING, FENCE } Object;
 typedef enum myColor { GREEN = 2, BLUE = 4 } MyColor;
-typedef enum fightevent { NONVIOLENT, STALKING, STRIKING, DAMAGETAKING } Fightevent; 
+//typedef enum fightmode { NONVIOLENT, FIGHTING } Fightmode; 
 typedef struct sight {
 	 Object leftnear;
 	 Object leftfar;
@@ -23,7 +23,7 @@ typedef struct being{
 	Sight obstacles;
 	bool resting;
 	MyColor myColor;
-	Fightevent fightevent;
+	bool fighting;
 } Being;
 
 
