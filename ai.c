@@ -6,6 +6,7 @@
 #include "event.h"
 #include "being.h"
 
+
 void look_ahead(Being *beingToTurn)
 {
 	// Handle revolution crossover.
@@ -124,11 +125,13 @@ void look_ahead(Being *beingToTurn)
 	}
 }
 
-void decision(Being *beingToTurn)
+
+void decision_peaceful(Being *beingToTurn)
 {
+
 	int i;
 
-	// If movement is stopped, decide start moving or not. *EARLY*
+	// If movement is stopped, decide start moving or not.
 	if(beingToTurn->resting){
 		if(getRndNum(2)==2){
 			beingToTurn->myHeading = getRndNum(8)-1;
@@ -155,18 +158,35 @@ void decision(Being *beingToTurn)
 				beingToTurn->resting = FALSE;
 			}
 		}
-
-		// Change behaviour by own will (only one notch).
-		// Turn left by own will.
-		if(i==5)
-			beingToTurn->myHeading--;
-		// Turn right by own will.
-		else if(i==6)
-			beingToTurn->myHeading++;
-		// Stop by own will.
-		else if(i==16)
-			beingToTurn->resting=TRUE;
-
+		switch(gamemode){
+			case FREEROAM:
+				// Change behaviour by own will (only one notch).
+				// Turn left by own will.
+				if(i==5)
+					beingToTurn->myHeading--;
+				// Turn right by own will.
+				else if(i==6)
+					beingToTurn->myHeading++;
+				// Stop by own will.
+				else if(i==16)
+					beingToTurn->resting=TRUE;
+				break
+			case REGROUP:
+				if(beingToTurn->myColor==GREEN)
+					if(i<5)
+						beingToTurn->myHeading=UPLEFT;
+					else if(i<9)
+						beingToTurn->myHeading=LEFT;
+					else if(i<13)
+						beingToTurn->myHeading=UP;
+				else if(beingToTurn->myColor==BLUE)
+					if(i<5)
+						beingToTurn->myHeading=DOWNRIGHT;
+					else if(i<9)
+						beingToTurn->myHeading=RIGHT;
+					else if(i<13)
+						beingToTurn->myHeading=DOWN;
+		}
 		// Look towards path ahead for obstacles.
 		look_ahead(beingToTurn);
 
@@ -175,14 +195,14 @@ void decision(Being *beingToTurn)
 		// If another being is far away.
 		if(beingToTurn->obstacles.leftnear==NONE && beingToTurn->obstacles.middlenear==NONE && beingToTurn->obstacles.rightnear==NONE){
 			// being obstacle far left.
-			if(beingToTurn->obstacles.leftfar==OTHERBEING && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==NONE)
+			if((beingToTurn->obstacles.leftfar==TEAMBEING||beingToTurn->obstacles.leftfar==ENEMYBEING) && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==NONE)
 				if(beingToTurn)
 				beingToTurn->myHeading++;
 			// being obstacle far right
-			else if(beingToTurn->obstacles.leftfar==NONE && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==OTHERBEING)
+			else if(beingToTurn->obstacles.leftfar==NONE && beingToTurn->obstacles.middlefar==NONE && (beingToTurn->obstacles.rightfar==TEAMBEING||beingToTurn->obstacles.rightfar==ENEMYBEING))
 				beingToTurn->myHeading--;
 			// being obstacle far middle
-			else if(beingToTurn->obstacles.leftfar==NONE && beingToTurn->obstacles.middlefar==OTHERBEING && beingToTurn->obstacles.rightfar==NONE){
+			else if(beingToTurn->obstacles.leftfar==NONE && (beingToTurn->obstacles.middlefar==TEAMBEING||beingToTurn->obstacles.middlefar==ENEMYBEING) && beingToTurn->obstacles.rightfar==NONE){
 				if(getRndNum(2)==1)
 					beingToTurn->myHeading--;
 				else
@@ -190,8 +210,9 @@ void decision(Being *beingToTurn)
 			}
 		}
 
-		// Likely stop if another being is close ahead.
-		if(beingToTurn->obstacles.leftnear==OTHERBEING || beingToTurn->obstacles.middlenear==OTHERBEING || beingToTurn->obstacles.rightnear==OTHERBEING){
+		// Likely stop if being is close ahead.
+		if(beingToTurn->obstacles.leftnear==TEAMBEING || beingToTurn->obstacles.middlenear==TEAMBEING || beingToTurn->obstacles.rightnear==TEAMBEING ||
+			beingToTurn->obstacles.leftnear==ENEMYBEING || beingToTurn->obstacles.middlenear==ENEMYBEING || beingToTurn->obstacles.rightnear==ENEMYBEING){
 			if(getRndNum(4)!=4)
 				beingToTurn->resting = TRUE;
 		}
@@ -233,6 +254,153 @@ void decision(Being *beingToTurn)
 		// Look towards path ahead for obstacles.
 		look_ahead(beingToTurn);
 		firstCheck = FALSE;
-	}  // while coast isn't clear.
+	}  // while coast isn't clear.	
+}
+
+
+void decision_attack(Being *beingToTurn)
+{
+
+	int i;
+
+	// If movement is stopped, decide start moving or not.
+	if(beingToTurn->resting){
+		if(getRndNum(2)==2){
+			beingToTurn->myHeading = getRndNum(8)-1;
+			beingToTurn->resting = FALSE;
+		}
+		else
+			return; // No other activity this round if decided to stand still.
+	}
+
+	// Look towards path ahead for obstacles.
+	look_ahead(beingToTurn);
+
+	bool firstCheck = TRUE;
+
+	// Keep deciding until the coast is clear.
+	while(firstCheck || (beingToTurn->obstacles.middlenear!=NONE && !beingToTurn->resting)){
+
+		i = getRndNum(16);
+
+		// Try with an entirely new heading by 50% chance if first choice was blocked.
+		if(!firstCheck){
+			if(getRndNum(2)==2){
+				beingToTurn->myHeading = getRndNum(8)-1;
+				beingToTurn->resting = FALSE;
+			}
+		}
+		switch(gamemode){
+			case FREEROAM:
+				// Change behaviour by own will (only one notch).
+				// Turn left by own will.
+				if(i==5)
+					beingToTurn->myHeading--;
+				// Turn right by own will.
+				else if(i==6)
+					beingToTurn->myHeading++;
+				// Stop by own will.
+				else if(i==16)
+					beingToTurn->resting=TRUE;
+				break
+			case REGROUP:
+				if(beingToTurn->myColor==GREEN)
+					if(i<5)
+						beingToTurn->myHeading=UPLEFT;
+					else if(i<9)
+						beingToTurn->myHeading=LEFT;
+					else if(i<13)
+						beingToTurn->myHeading=UP;
+				else if(beingToTurn->myColor==BLUE)
+					if(i<5)
+						beingToTurn->myHeading=DOWNRIGHT;
+					else if(i<9)
+						beingToTurn->myHeading=RIGHT;
+					else if(i<13)
+						beingToTurn->myHeading=DOWN;
+		}
+		// Look towards path ahead for obstacles.
+		look_ahead(beingToTurn);
+
+		// Handling of other beings *****************************************************************************
+
+		// If another being is far away.
+		if(beingToTurn->obstacles.leftnear==NONE && beingToTurn->obstacles.middlenear==NONE && beingToTurn->obstacles.rightnear==NONE){
+			// being obstacle far left.
+			if((beingToTurn->obstacles.leftfar==TEAMBEING||beingToTurn->obstacles.leftfar==ENEMYBEING) && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==NONE)
+				if(beingToTurn)
+				beingToTurn->myHeading++;
+			// being obstacle far right
+			else if(beingToTurn->obstacles.leftfar==NONE && beingToTurn->obstacles.middlefar==NONE && (beingToTurn->obstacles.rightfar==TEAMBEING||beingToTurn->obstacles.rightfar==ENEMYBEING))
+				beingToTurn->myHeading--;
+			// being obstacle far middle
+			else if(beingToTurn->obstacles.leftfar==NONE && (beingToTurn->obstacles.middlefar==TEAMBEING||beingToTurn->obstacles.middlefar==ENEMYBEING) && beingToTurn->obstacles.rightfar==NONE){
+				if(getRndNum(2)==1)
+					beingToTurn->myHeading--;
+				else
+					beingToTurn->myHeading++;
+			}
+		}
+
+		// Likely stop if being is close ahead.
+		//if(beingToTurn->obstacles.leftnear==TEAMBEING || beingToTurn->obstacles.middlenear==TEAMBEING || beingToTurn->obstacles.rightnear==TEAMBEING ||
+		//	beingToTurn->obstacles.leftnear==ENEMYBEING || beingToTurn->obstacles.middlenear==ENEMYBEING || beingToTurn->obstacles.rightnear==ENEMYBEING){
+		//	if(getRndNum(4)!=4)
+		//		beingToTurn->resting = TRUE;
+		//}
+
+
+		// ********************************************************************************************************
+
+		// Look towards path ahead for obstacles.
+		look_ahead(beingToTurn);
+
+		// Special handling of fences (outside the standard collision avoidance) **********************************
+
+		// If fence spotted straight ahead (in the middle) and nothing is closer:
+		if(beingToTurn->obstacles.leftfar==NONE && beingToTurn->obstacles.middlenear==NONE && beingToTurn->obstacles.rightnear==NONE){
+			if(beingToTurn->obstacles.middlefar==FENCE){
+				if(beingToTurn->obstacles.rightfar==FENCE && beingToTurn->obstacles.leftfar==NONE)
+					beingToTurn->myHeading--;
+				else if(beingToTurn->obstacles.rightfar==NONE && beingToTurn->obstacles.leftfar==FENCE)
+					beingToTurn->myHeading++;
+				else if(beingToTurn->obstacles.rightfar==NONE && beingToTurn->obstacles.leftfar==NONE){
+					if(getRndNum(2)==1)
+						beingToTurn->myHeading--;
+					else
+						beingToTurn->myHeading++;
+				}
+			}
+
+		}
+
+		// Look towards path ahead for obstacles.
+		look_ahead(beingToTurn);
+
+
+		// ************************************************************************************************************
+
+		// Look towards path ahead for obstacles.
+		look_ahead(beingToTurn);
+		firstCheck = FALSE;
+	}  // while coast isn't clear.	
+}
+
+
+void decision(Being *beingToTurn)
+{
+	switch(gamemode){
+		case FREEROAM:
+			decision_peaceful(beingToTurn)
+			break;
+		case REGROUP:
+			decision_peaceful(beingToTurn)
+			break;
+		case ATTACK:
+			decision_attack(beingToTurn)
+			break;
+		default:
+			break;
+	}
 }
 
