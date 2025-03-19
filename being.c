@@ -63,6 +63,7 @@ int spawnBeing(Being *beingToGiveLife, const int *beingNbr, const MyColor *myCol
 
 void movement(Being *beingToTurn)
 {
+	// only move if not resting or fighting
 	if(!beingToTurn->resting && !beingToTurn->fighting){
 		switch(beingToTurn->myHeading){
 			case UP:
@@ -116,7 +117,7 @@ void turnBeing(Being *beingToTurn, const int *beingNbr)
 }
 
 
-void strikeBeing(Being *beingToStrike){
+void strikeBeingOnCoordinates(const int *x, const int *y){
 	if(getRndNum(3)==3){
 		beingToStrike->hitpoints--;
 		attron(COLOR_PAIR(beingToPrint->myColor));

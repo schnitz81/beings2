@@ -327,14 +327,14 @@ void decision_attack(Being *beingToTurn)
 		// If another being is far away.
 		if(beingToTurn->obstacles.leftnear==NONE && beingToTurn->obstacles.middlenear==NONE && beingToTurn->obstacles.rightnear==NONE){
 			// being obstacle far left.
-			if((beingToTurn->obstacles.leftfar==TEAMBEING||beingToTurn->obstacles.leftfar==ENEMYBEING) && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==NONE)
+			if(beingToTurn->obstacles.leftfar==TEAMBEING && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==NONE)
 				if(beingToTurn)
 				beingToTurn->myHeading++;
 			// being obstacle far right
-			else if(beingToTurn->obstacles.leftfar==NONE && beingToTurn->obstacles.middlefar==NONE && (beingToTurn->obstacles.rightfar==TEAMBEING||beingToTurn->obstacles.rightfar==ENEMYBEING))
+			else if(beingToTurn->obstacles.leftfar==NONE && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==TEAMBEING)
 				beingToTurn->myHeading--;
 			// being obstacle far middle
-			else if(beingToTurn->obstacles.leftfar==NONE && (beingToTurn->obstacles.middlefar==TEAMBEING||beingToTurn->obstacles.middlefar==ENEMYBEING) && beingToTurn->obstacles.rightfar==NONE){
+			else if(beingToTurn->obstacles.leftfar==NONE && beingToTurn->obstacles.middlefar==TEAMBEING && beingToTurn->obstacles.rightfar==NONE){
 				if(getRndNum(2)==1)
 					beingToTurn->myHeading--;
 				else
@@ -371,11 +371,36 @@ void decision_attack(Being *beingToTurn)
 						beingToTurn->myHeading++;
 				}
 			}
-
 		}
 
 		// Look towards path ahead for obstacles.
 		look_ahead(beingToTurn);
+		
+		// Attack enemy logic *****************************************************************************************
+		// enemy near - high prio - strike
+			// check for enemy near
+			//Object surrounding[3][3];
+			char square;
+			int i,j;
+			for(j=0;j<=2;j++){	// Update obstacles of the current surroundings.
+				for(i=0;i<=2;i++){
+					squareChar = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_CHARTEXT;  // Get square char.
+					squareCharColor = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_COLOR;  // Get square char.
+					if(squareChar=='*' && squareCharColor!=beingToTurn->myColor)
+						surrounding[i][j] = ENEMYBEING;
+						strikeBeingOnCoordinates((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i);
+				}
+			}
+		
+		
+		
+		if()
+			beingToTurn->fighting = TRUE;
+		
+		
+		
+		// enemy far 
+		else if()
 
 
 		// ************************************************************************************************************
