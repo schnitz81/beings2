@@ -194,14 +194,46 @@ int setSimulationSpeed()
 }
 
 
+void hitHandleBeing(Being *beingToTurn, Attackposition *attackposition)
+{
+	//only compare if attackposition is set
+	if(attackposition->posx != 0 && attackposition->posy != 0){
+		// compare being position against attack
+		if(beingToTurn->posx == attackposition->posx && beingToTurn->posy == attackposition->posy){
+			attackposition->posx = 0;  // reset attack position
+			attackposition->posy = 0;
+			beingToTurn->hitpoints--;
+			if(beingToTurn->hitpoints > 0){
+				init_pair(2,2,-1);  // being turns red when taking damage
+				attron(COLOR_PAIR(beingColor));
+				mvprintw(beingToPrint->posy,beingToPrint->posx,"*");
+				attroff(COLOR_PAIR(beingColor));
+			}
+			else{
+				init_pair(1,1,-1);  // make being grey
+				attron(COLOR_PAIR(1));
+				mvprintw(beingToPrint->posy,beingToPrint->posx,"*");
+				attroff(COLOR_PAIR(1));
+				beingToTurn->alive=FALSE;  // not alive when hitpoints reach zero
+			}
+		}
+	}
+	
+}
+
+
 void runWorld()
 {
 	unsigned int nbrOfGreenBeings, nbrOfBlueBeings;
 	int i, simulationSpeed;
+	union Attackposition *attackposition;
+	bool isHit;
 	// int newBeingToSpawnNbr;  ////////////////////////////////////////////////////////////////  used in create/remove
 	//bool beingCreated;    ////////////////////////////////////////////////////////////////  used in create/remove
 	MyColor greenBeingColor, blueBeingColor;
 	gamemode = FREEROAM;
+	*attackposition.posx = 0;
+	*attackposition.posy = 0;
 	greenBeingColor = GREEN;
 	nbrOfGreenBeings = getNbrOfBeings(&greenBeingColor);
 	Being *greenBeings = malloc(nbrOfGreenBeings*sizeof(Being));
@@ -220,10 +252,19 @@ void runWorld()
 	int ch = 0;
 	while(ch != 27){
 		ch=getch();
+
+		// handle attack hits on all beings
+		isHit = False;
 		for(i=0;i<nbrOfGreenBeings;i++)
-			turnBeing(&greenBeings[i], &i);
+			hitHandleBeing(&greenBeings[i], &attackposition);
 		for(i=0;i<nbrOfBlueBeings;i++)
-			turnBeing(&blueBeings[i], &i);
+			hitHandleBeing(&blueBeings[i], &attackposition);
+
+		// turn all beings
+		for(i=0;i<nbrOfGreenBeings;i++)
+			turnBeing(&greenBeings[i]);
+		for(i=0;i<nbrOfBlueBeings;i++)
+			turnBeing(&blueBeings[i]);
 		refresh();
 
 		// Change simulation speed or number of beings during run.
@@ -263,6 +304,7 @@ void runWorld()
 	}
 	free(greenBeings);
 	free(blueBeings);
+	free(attackpositions);
 	getch();
 	endwin();
 }

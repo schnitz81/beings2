@@ -12,7 +12,8 @@ void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const 
 	// Initialize values of new being.
 	beingToGiveLife->posx = *x;
 	beingToGiveLife->posy = *y;
-	beingToGiveLife->hitpoints = 5;
+	beingToGiveLife->hitpoints = 10;
+	beingToGiveLife->alive = TRUE;
 	beingToGiveLife->myHeading = getRndNum(8)-1;
 	beingToGiveLife->obstacles.leftfar = 0;
 	beingToGiveLife->obstacles.leftnear = 0;
@@ -28,10 +29,15 @@ void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const 
 
 void beingToPrint(const Being *beingToPrint)
 {
-	init_pair(beingToPrint->myColor, beingToPrint->myColor,-1);  // print color according to being property
-	attron(COLOR_PAIR(beingToPrint->myColor));
+	int beingColor;
+	if(beingToPrint->fighting)  // make being cyan if attacking
+		beingColor = 3;
+	else
+		beingColor = beingToPrint->myColor;
+	init_pair(beingColor,beingColor,-1);  // print color according to being property
+	attron(COLOR_PAIR(beingColor));
 	mvprintw(beingToPrint->posy,beingToPrint->posx,"*");
-	attroff(COLOR_PAIR(beingToPrint->myColor));
+	attroff(COLOR_PAIR(beingColor));
 }
 
 
@@ -63,8 +69,8 @@ int spawnBeing(Being *beingToGiveLife, const int *beingNbr, const MyColor *myCol
 
 void movement(Being *beingToTurn)
 {
-	// only move if not resting or fighting
-	if(!beingToTurn->resting && !beingToTurn->fighting){
+	// only move if alive and not resting or fighting
+	if(beingToTurn->alive==TRUE && !beingToTurn->resting && !beingToTurn->fighting){
 		switch(beingToTurn->myHeading){
 			case UP:
 				beingToTurn->posy--;
@@ -101,10 +107,20 @@ void movement(Being *beingToTurn)
 }
 
 
-void turnBeing(Being *beingToTurn, const int *beingNbr)
+void turnBeing(Being *beingToTurn)
 {
+
+	if(!beingToTurn->alive)  // do nothing if being is not alive
+		return;
+
+	// reset fighting mode every turn, will be reenabled when needed
+	beingToTurn->fighting = FALSE;
+
 	//Erase old position
 	mvprintw(beingToTurn->posy,beingToTurn->posx, " ");
+
+	// check if being is hit by successful attack
+	attackhandling(beingToTurn)
 
 	// Evaluate and choose
 	decision(beingToTurn);
@@ -117,14 +133,14 @@ void turnBeing(Being *beingToTurn, const int *beingNbr)
 }
 
 
-void strikeBeingOnCoordinates(const int *x, const int *y){
-	if(getRndNum(3)==3){
-		beingToStrike->hitpoints--;
-		attron(COLOR_PAIR(beingToPrint->myColor));
-		mvprintw(beingToStrike->posy,beingToStrike->posx,"*");
-		attroff(COLOR_PAIR(beingToPrint->myColor));
-	}
-}
+//void strikeBeingOnCoordinates(const int *x, const int *y){
+//	if(getRndNum(3)==3){  // 1/3 chance of successful attack
+//		beingToStrike->hitpoints--;
+//		attron(COLOR_PAIR(beingToPrint->myColor));
+//		mvprintw(beingToStrike->posy,beingToStrike->posx,"*");
+//		attroff(COLOR_PAIR(beingToPrint->myColor));
+//	}
+//}
 
 
 //bool isEnemy(Being *beingPerspective, const int *targetx, const int *targety)
