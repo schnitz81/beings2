@@ -254,7 +254,7 @@ void decision_peaceful(Being *beingToTurn)
 		// Look towards path ahead for obstacles.
 		look_ahead(beingToTurn);
 		firstCheck = FALSE;
-	}  // while coast isn't clear.	
+	}  // while coast isn't clear.
 }
 
 
@@ -375,31 +375,26 @@ void decision_attack(Being *beingToTurn)
 
 		// Look towards path ahead for obstacles.
 		look_ahead(beingToTurn);
-		
+
 		// Attack enemy logic *****************************************************************************************
 		// enemy near - high prio - strike
-			// check for enemy near
-			//Object surrounding[3][3];
-			char square;
-			int i,j;
-			for(j=0;j<=2;j++){	// Update obstacles of the current surroundings.
-				for(i=0;i<=2;i++){
-					squareChar = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_CHARTEXT;  // Get square char.
-					squareCharColor = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_COLOR;  // Get square char.
-					if(squareChar=='*' && squareCharColor!=beingToTurn->myColor)
-						surrounding[i][j] = ENEMYBEING;
-						strikeBeingOnCoordinates((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i);
+		// check for enemy near
+		//Object surrounding[3][3];
+		char square;
+		int i,j;
+		for(j=0;j<=2;j++){	// Update obstacles of the current surroundings.
+			for(i=0;i<=2;i++){
+				squareChar = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_CHARTEXT;  // Get square char.
+				squareCharColor = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_COLOR;  // Get square char.
+				if(squareChar=='*' && squareCharColor!=beingToTurn->myColor){
+					//surrounding[i][j] = ENEMYBEING;
+					beingToTurn->fighting = TRUE;
+					strikeBeingOnCoordinates((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i);
 				}
 			}
-		
-		
-		
-		if()
-			beingToTurn->fighting = TRUE;
-		
-		
-		
-		// enemy far 
+		}
+
+		// enemy far
 		else if()
 
 
@@ -408,7 +403,7 @@ void decision_attack(Being *beingToTurn)
 		// Look towards path ahead for obstacles.
 		look_ahead(beingToTurn);
 		firstCheck = FALSE;
-	}  // while coast isn't clear.	
+	}  // while coast isn't clear.
 }
 
 

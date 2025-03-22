@@ -5,6 +5,12 @@
 #include "being.h"
 
 typedef enum gamemode {FREEROAM, REGROUP, ATTACK} Gamemode;
+
+union Attackposition {
+	int posx;
+	int posy;
+};
+
 extern Gamemode gamemode;
 extern int maxx;
 extern int maxy;
