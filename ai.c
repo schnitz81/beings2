@@ -377,6 +377,15 @@ void decision_attack(Being *beingToTurn)
 		look_ahead(beingToTurn);
 
 		// Attack enemy logic *****************************************************************************************
+		
+		// enemy far
+		if(beingToTurn->obstacles.leftfar==ENEMYBEING && beingToTurn->obstacles.leftnear==NONE)
+			beingToTurn->myHeading--;
+		else if(beingToTurn->obstacles.rightfar==ENEMYBEING && beingToTurn->obstacles.rightnear==NONE)
+			beingToTurn->myHeading++;
+
+		
+		
 		// enemy near - high prio - strike
 		// check for enemy near
 		//Object surrounding[3][3];
@@ -386,7 +395,7 @@ void decision_attack(Being *beingToTurn)
 			for(i=0;i<=2;i++){
 				squareChar = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_CHARTEXT;  // Get square char.
 				squareCharColor = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_COLOR;  // Get square char.
-				if(squareChar=='*' && squareCharColor!=beingToTurn->myColor){
+				if(squareChar=='*' && squareCharColor!=beingToTurn->myColor && squareCharColor!=1 && squareCharColor!=2){
 					//surrounding[i][j] = ENEMYBEING;
 					beingToTurn->fighting = TRUE;
 					strikeBeingOnCoordinates((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i);
@@ -394,9 +403,7 @@ void decision_attack(Being *beingToTurn)
 			}
 		}
 
-		// enemy far
-		else if()
-
+		
 
 		// ************************************************************************************************************
 
