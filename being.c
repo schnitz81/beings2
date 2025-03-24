@@ -24,6 +24,7 @@ void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const 
 	beingToGiveLife->resting = TRUE;
 	beingToGiveLife->myColor = *myColor;
 	beingToGiveLife->fighting = FALSE;
+	beingToGiveLife->isHit = FALSE;
 }
 
 
@@ -31,7 +32,7 @@ void beingToPrint(const Being *beingToPrint)
 {
 	int beingColor;
 	if(beingToPrint->fighting)  // make being cyan if attacking
-		beingColor = 3;
+		beingColor = COLOR_CYAN;
 	else
 		beingColor = beingToPrint->myColor;
 	init_pair(beingColor,beingColor,-1);  // print color according to being property
@@ -107,11 +108,15 @@ void movement(Being *beingToTurn)
 }
 
 
-void turnBeing(Being *beingToTurn)
+void turnBeing(Being *beingToTurn, Attackposition *attackposition)
 {
 
 	if(!beingToTurn->alive)  // do nothing if being is not alive
 		return;
+	else if(beingToTurn->isHit){  // skip turn if hit
+		beingToTurn->isHit = FALSE;
+		return;
+	}
 
 	// reset fighting mode every turn, will be reenabled when needed
 	beingToTurn->fighting = FALSE;
@@ -120,10 +125,10 @@ void turnBeing(Being *beingToTurn)
 	mvprintw(beingToTurn->posy,beingToTurn->posx, " ");
 
 	// check if being is hit by successful attack
-	attackhandling(beingToTurn)
+	hitHandleBeing(beingToTurn, attackposition);
 
 	// Evaluate and choose
-	decision(beingToTurn);
+	decision(beingToTurn, attackposition);
 
 	//Move according to decision.
 	movement(beingToTurn);

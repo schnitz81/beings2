@@ -194,31 +194,36 @@ int setSimulationSpeed()
 }
 
 
-void hitHandleBeing(Being *beingToTurn, Attackposition *attackposition)
+void hitHandleBeing(Being *beingToHitcheck, Attackposition *attackposition)
 {
 	//only compare if attackposition is set
 	if(attackposition->posx != 0 && attackposition->posy != 0){
+
+		// attack successful/failed
+		if(getRndNum(3)!=3)
+			return;
+
 		// compare being position against attack
-		if(beingToTurn->posx == attackposition->posx && beingToTurn->posy == attackposition->posy){
+		if(beingToHitcheck->posx == attackposition->posx && beingToHitcheck->posy == attackposition->posy){
 			attackposition->posx = 0;  // reset attack position
 			attackposition->posy = 0;
-			beingToTurn->hitpoints--;
-			if(beingToTurn->hitpoints > 0){
-				init_pair(2,2,-1);  // being turns red when taking damage
-				attron(COLOR_PAIR(beingColor));
-				mvprintw(beingToPrint->posy,beingToPrint->posx,"*");
-				attroff(COLOR_PAIR(beingColor));
+			beingToHitcheck->hitpoints--;
+			if(beingToHitcheck->hitpoints > 0){
+				init_pair(COLOR_RED,COLOR_RED,-1);  // being turns red when taking damage
+				attron(COLOR_PAIR(COLOR_RED));
+				mvprintw(beingToHitcheck->posy,beingToHitcheck->posx,"*");
+				attroff(COLOR_PAIR(COLOR_RED));
+				beingToHitcheck->isHit = TRUE;
 			}
 			else{
-				init_pair(1,1,-1);  // make being grey
-				attron(COLOR_PAIR(1));
-				mvprintw(beingToPrint->posy,beingToPrint->posx,"*");
-				attroff(COLOR_PAIR(1));
-				beingToTurn->alive=FALSE;  // not alive when hitpoints reach zero
+				init_pair(COLOR_MAGENTA,COLOR_MAGENTA,-1);  // make being magenta
+				attron(COLOR_PAIR(COLOR_MAGENTA));
+				mvprintw(beingToHitcheck->posy,beingToHitcheck->posx,"*");
+				attroff(COLOR_PAIR(COLOR_MAGENTA));
+				beingToHitcheck->alive=FALSE;  // not alive when hitpoints reach zero
 			}
 		}
 	}
-	
 }
 
 
@@ -226,14 +231,13 @@ void runWorld()
 {
 	unsigned int nbrOfGreenBeings, nbrOfBlueBeings;
 	int i, simulationSpeed;
-	union Attackposition *attackposition;
-	bool isHit;
+	Attackposition attackposition;
 	// int newBeingToSpawnNbr;  ////////////////////////////////////////////////////////////////  used in create/remove
 	//bool beingCreated;    ////////////////////////////////////////////////////////////////  used in create/remove
 	MyColor greenBeingColor, blueBeingColor;
 	gamemode = FREEROAM;
-	*attackposition.posx = 0;
-	*attackposition.posy = 0;
+	attackposition.posy = 0;
+	attackposition.posx = 0;
 	greenBeingColor = GREEN;
 	nbrOfGreenBeings = getNbrOfBeings(&greenBeingColor);
 	Being *greenBeings = malloc(nbrOfGreenBeings*sizeof(Being));
@@ -254,7 +258,6 @@ void runWorld()
 		ch=getch();
 
 		// handle attack hits on all beings
-		isHit = False;
 		for(i=0;i<nbrOfGreenBeings;i++)
 			hitHandleBeing(&greenBeings[i], &attackposition);
 		for(i=0;i<nbrOfBlueBeings;i++)
@@ -262,9 +265,9 @@ void runWorld()
 
 		// turn all beings
 		for(i=0;i<nbrOfGreenBeings;i++)
-			turnBeing(&greenBeings[i]);
+			turnBeing(&greenBeings[i], &attackposition);
 		for(i=0;i<nbrOfBlueBeings;i++)
-			turnBeing(&blueBeings[i]);
+			turnBeing(&blueBeings[i], &attackposition);
 		refresh();
 
 		// Change simulation speed or number of beings during run.
@@ -304,13 +307,12 @@ void runWorld()
 	}
 	free(greenBeings);
 	free(blueBeings);
-	free(attackpositions);
 	getch();
 	endwin();
 }
 
 
-bool checkIfCoordinatesAreClear(const int *x, const int *y)
+bool checkIfCoordinatesAreClear(const int *x, const int *y)  // check at init spawn
 {
 	bool isClear;
 	char checksquare;

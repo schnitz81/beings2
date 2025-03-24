@@ -28,17 +28,23 @@ void look_ahead(Being *beingToTurn)
 	}
 
 	Object surrounding[5][5];
-	char square;
+	char squareChar;
+	int squareCharColor;
 	int i,j;
 	for(j=0;j<=4;j++){	// Update obstacles of the current surroundings.
 		for(i=0;i<=4;i++){
 			squareChar = mvinch((beingToTurn->posy-2)+j,(beingToTurn->posx-2)+i) & A_CHARTEXT;  // Get square char.
-			squareCharColor = mvinch((beingToTurn->posy-2)+j,(beingToTurn->posx-2)+i) & A_COLOR;  // Get square char.
+			squareAttrs = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_ATTRIBUTES;  // Get square attributes.
+			squareCharColor = (squareAttrs & A_COLOR) >> 16;  // Get square char.
 			if(squareChar==' ')
 				surrounding[i][j] = NONE;
 			else if(squareChar=='*')
 				if(squareCharColor==beingToTurn->myColor)
 					surrounding[i][j] = TEAMBEING;
+				else if(squareCharColor==COLOR_CYAN)
+					surrounding[i][j] = FIGHTINGBEING;
+				else if(squareCharColor==COLOR_MAGENTA)
+					surrounding[i][j] = DEADBEING;
 				else
 					surrounding[i][j] = ENEMYBEING;
 			else if(squareChar=='=' || squareChar=='|' || squareChar=='#')
@@ -170,22 +176,27 @@ void decision_peaceful(Being *beingToTurn)
 				// Stop by own will.
 				else if(i==16)
 					beingToTurn->resting=TRUE;
-				break
+				break;
 			case REGROUP:
-				if(beingToTurn->myColor==GREEN)
+				if(beingToTurn->myColor==GREEN){
 					if(i<5)
 						beingToTurn->myHeading=UPLEFT;
 					else if(i<9)
 						beingToTurn->myHeading=LEFT;
 					else if(i<13)
 						beingToTurn->myHeading=UP;
-				else if(beingToTurn->myColor==BLUE)
+				}
+				else if(beingToTurn->myColor==BLUE){
 					if(i<5)
 						beingToTurn->myHeading=DOWNRIGHT;
 					else if(i<9)
 						beingToTurn->myHeading=RIGHT;
 					else if(i<13)
 						beingToTurn->myHeading=DOWN;
+				}
+				break;
+			case ATTACK:
+				break;
 		}
 		// Look towards path ahead for obstacles.
 		look_ahead(beingToTurn);
@@ -195,9 +206,10 @@ void decision_peaceful(Being *beingToTurn)
 		// If another being is far away.
 		if(beingToTurn->obstacles.leftnear==NONE && beingToTurn->obstacles.middlenear==NONE && beingToTurn->obstacles.rightnear==NONE){
 			// being obstacle far left.
-			if((beingToTurn->obstacles.leftfar==TEAMBEING||beingToTurn->obstacles.leftfar==ENEMYBEING) && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==NONE)
+			if((beingToTurn->obstacles.leftfar==TEAMBEING||beingToTurn->obstacles.leftfar==ENEMYBEING) && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==NONE){
 				if(beingToTurn)
 				beingToTurn->myHeading++;
+			}
 			// being obstacle far right
 			else if(beingToTurn->obstacles.leftfar==NONE && beingToTurn->obstacles.middlefar==NONE && (beingToTurn->obstacles.rightfar==TEAMBEING||beingToTurn->obstacles.rightfar==ENEMYBEING))
 				beingToTurn->myHeading--;
@@ -258,10 +270,10 @@ void decision_peaceful(Being *beingToTurn)
 }
 
 
-void decision_attack(Being *beingToTurn)
+void decision_attack(Being *beingToTurn, Attackposition *attackposition)
 {
 
-	int i;
+	int i,j;
 
 	// If movement is stopped, decide start moving or not.
 	if(beingToTurn->resting){
@@ -290,35 +302,15 @@ void decision_attack(Being *beingToTurn)
 				beingToTurn->resting = FALSE;
 			}
 		}
-		switch(gamemode){
-			case FREEROAM:
-				// Change behaviour by own will (only one notch).
-				// Turn left by own will.
-				if(i==5)
-					beingToTurn->myHeading--;
-				// Turn right by own will.
-				else if(i==6)
-					beingToTurn->myHeading++;
-				// Stop by own will.
-				else if(i==16)
-					beingToTurn->resting=TRUE;
-				break
-			case REGROUP:
-				if(beingToTurn->myColor==GREEN)
-					if(i<5)
-						beingToTurn->myHeading=UPLEFT;
-					else if(i<9)
-						beingToTurn->myHeading=LEFT;
-					else if(i<13)
-						beingToTurn->myHeading=UP;
-				else if(beingToTurn->myColor==BLUE)
-					if(i<5)
-						beingToTurn->myHeading=DOWNRIGHT;
-					else if(i<9)
-						beingToTurn->myHeading=RIGHT;
-					else if(i<13)
-						beingToTurn->myHeading=DOWN;
-		}
+
+		// Change behaviour by own will (only one notch, no resting in attack mode).
+		// Turn left by own will.
+		if(i==5)
+			beingToTurn->myHeading--;
+		// Turn right by own will.
+		else if(i==6)
+			beingToTurn->myHeading++;
+
 		// Look towards path ahead for obstacles.
 		look_ahead(beingToTurn);
 
@@ -327,9 +319,10 @@ void decision_attack(Being *beingToTurn)
 		// If another being is far away.
 		if(beingToTurn->obstacles.leftnear==NONE && beingToTurn->obstacles.middlenear==NONE && beingToTurn->obstacles.rightnear==NONE){
 			// being obstacle far left.
-			if(beingToTurn->obstacles.leftfar==TEAMBEING && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==NONE)
+			if(beingToTurn->obstacles.leftfar==TEAMBEING && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==NONE){
 				if(beingToTurn)
 				beingToTurn->myHeading++;
+			}
 			// being obstacle far right
 			else if(beingToTurn->obstacles.leftfar==NONE && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==TEAMBEING)
 				beingToTurn->myHeading--;
@@ -377,33 +370,44 @@ void decision_attack(Being *beingToTurn)
 		look_ahead(beingToTurn);
 
 		// Attack enemy logic *****************************************************************************************
-		
+
+		// Fighting spotted logic
+		//if(beingToTurn->obstacles.leftfar==FIGHTINGBEING && beingToTurn->obstacles.leftnear==NONE)
+		//	beingToTurn->myHeading--;
+		//else if(beingToTurn->obstacles.rightfar==FIGHTINGBEING && beingToTurn->obstacles.rightnear==NONE)
+		//	beingToTurn->myHeading++;
+
+
 		// enemy far
 		if(beingToTurn->obstacles.leftfar==ENEMYBEING && beingToTurn->obstacles.leftnear==NONE)
 			beingToTurn->myHeading--;
 		else if(beingToTurn->obstacles.rightfar==ENEMYBEING && beingToTurn->obstacles.rightnear==NONE)
 			beingToTurn->myHeading++;
 
-		
-		
+
+
 		// enemy near - high prio - strike
-		// check for enemy near
+		// check for enemy near in all directions
 		//Object surrounding[3][3];
-		char square;
-		int i,j;
-		for(j=0;j<=2;j++){	// Update obstacles of the current surroundings.
+		char squareChar;
+		int squareAttrs;
+		int squareCharColor;
+		for(j=0;j<=2;j++){  // Update obstacles of the current surroundings.
 			for(i=0;i<=2;i++){
+				if(i==1&&j==1)  // selfskip
+					continue;
 				squareChar = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_CHARTEXT;  // Get square char.
-				squareCharColor = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_COLOR;  // Get square char.
-				if(squareChar=='*' && squareCharColor!=beingToTurn->myColor && squareCharColor!=1 && squareCharColor!=2){
+				squareAttrs = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_ATTRIBUTES;  // Get square attributes.
+				squareCharColor = (squareAttrs & A_COLOR) >> 16;  // Get square char.
+				if(squareChar=='*' && squareCharColor!=beingToTurn->myColor && squareCharColor!=COLOR_CYAN && squareCharColor!=COLOR_RED && squareCharColor!=COLOR_MAGENTA){
 					//surrounding[i][j] = ENEMYBEING;
 					beingToTurn->fighting = TRUE;
-					strikeBeingOnCoordinates((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i);
+					attackposition->posy = (beingToTurn->posy-1)+j;
+					attackposition->posx = (beingToTurn->posx-1)+i;
 				}
 			}
 		}
 
-		
 
 		// ************************************************************************************************************
 
@@ -414,17 +418,17 @@ void decision_attack(Being *beingToTurn)
 }
 
 
-void decision(Being *beingToTurn)
+void decision(Being *beingToTurn, Attackposition *attackposition)
 {
 	switch(gamemode){
 		case FREEROAM:
-			decision_peaceful(beingToTurn)
+			decision_peaceful(beingToTurn);
 			break;
 		case REGROUP:
-			decision_peaceful(beingToTurn)
+			decision_peaceful(beingToTurn);
 			break;
 		case ATTACK:
-			decision_attack(beingToTurn)
+			decision_attack(beingToTurn, attackposition);
 			break;
 		default:
 			break;
