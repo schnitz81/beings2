@@ -124,9 +124,6 @@ void turnBeing(Being *beingToTurn, Attackposition *attackposition)
 	//Erase old position
 	mvprintw(beingToTurn->posy,beingToTurn->posx, " ");
 
-	// check if being is hit by successful attack
-	hitHandleBeing(beingToTurn, attackposition);
-
 	// Evaluate and choose
 	decision(beingToTurn, attackposition);
 

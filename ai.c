@@ -29,6 +29,7 @@ void look_ahead(Being *beingToTurn)
 
 	Object surrounding[5][5];
 	char squareChar;
+	int squareAttrs;
 	int squareCharColor;
 	int i,j;
 	for(j=0;j<=4;j++){	// Update obstacles of the current surroundings.
@@ -399,11 +400,13 @@ void decision_attack(Being *beingToTurn, Attackposition *attackposition)
 				squareChar = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_CHARTEXT;  // Get square char.
 				squareAttrs = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_ATTRIBUTES;  // Get square attributes.
 				squareCharColor = (squareAttrs & A_COLOR) >> 16;  // Get square char.
-				if(squareChar=='*' && squareCharColor!=beingToTurn->myColor && squareCharColor!=COLOR_CYAN && squareCharColor!=COLOR_RED && squareCharColor!=COLOR_MAGENTA){
-					//surrounding[i][j] = ENEMYBEING;
-					beingToTurn->fighting = TRUE;
-					attackposition->posy = (beingToTurn->posy-1)+j;
-					attackposition->posx = (beingToTurn->posx-1)+i;
+				if(squareChar=='*' && !beingToTurn->isHit && squareCharColor!=beingToTurn->myColor && squareCharColor!=COLOR_CYAN && squareCharColor!=COLOR_RED && squareCharColor!=COLOR_MAGENTA){
+					if(getRndNum(2)==2){  // successful attack attempt
+						beingToTurn->fighting = TRUE;
+						attackposition->posy = (beingToTurn->posy-1)+j;
+						attackposition->posx = (beingToTurn->posx-1)+i;
+						return;
+					}
 				}
 			}
 		}
