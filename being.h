@@ -1,8 +1,15 @@
 #ifndef BEING_H
 #define BEING_H
 
+
+typedef union attack_coordinates{
+	int posy;
+	int posx;
+} Attackposition;
+
+
 typedef enum heading { UNDERVALUE2 = -2, UNDERVALUE1, UP, UPRIGHT, RIGHT, DOWNRIGHT, DOWN, DOWNLEFT, LEFT, UPLEFT, OVERVALUE1, OVERVALUE2 } Heading;
-typedef enum object { NONE, TEAMBEING, ENEMYBEING, FENCE } Object;
+typedef enum object { NONE, TEAMBEING, FIGHTINGBEING, ENEMYBEING, DEADBEING, FENCE } Object;
 typedef enum myColor { GREEN = 2, BLUE = 4 } MyColor;
 //typedef enum fightmode { NONVIOLENT, FIGHTING } Fightmode; 
 typedef struct sight {
@@ -25,6 +32,7 @@ typedef struct being{
 	bool resting;
 	MyColor myColor;
 	bool fighting;
+	bool isHit;
 } Being;
 
 
@@ -34,7 +42,7 @@ void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const 
 void beingToPrint(const Being *beingToPrint);
 int spawnBeing(Being *beingToGiveLife, const int *beingNbr, const MyColor *myColor);
 void movement(Being *beingToTurn);
-void turnBeing(Being *beingToTurn, const int *beingNbr);
+void turnBeing(Being *beingToTurn, Attackposition *attackposition);
 //bool isEnemy(Being *beingMe, const int *targetx, const int *targety);
 
 #endif

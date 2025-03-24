@@ -4,16 +4,13 @@
 #include <stdbool.h>
 #include "being.h"
 
+
 typedef enum gamemode {FREEROAM, REGROUP, ATTACK} Gamemode;
 
-union Attackposition {
-	int posx;
-	int posy;
-};
 
 extern Gamemode gamemode;
-extern int maxx;
 extern int maxy;
+extern int maxx;
 
 
 /* Function prototypes */
@@ -24,6 +21,7 @@ unsigned int getMaxNbrOfBeings();
 unsigned int getNbrOfBeings();
 unsigned int spawnBeings(Being *beings, const unsigned int *nbrOfBeings, const MyColor *beingColor);
 int setSimulationSpeed();
+void hitHandleBeing(Being *beingToTurn, Attackposition *attackposition);
 void runWorld();
 bool checkIfCoordinatesAreClear(const int *x, const int *y);
 
