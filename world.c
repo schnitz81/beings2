@@ -196,11 +196,14 @@ int setSimulationSpeed()
 
 void hitHandleBeing(Being *beingToHitcheck, Attackposition *attackposition)
 {
+	if(!beingToHitcheck->alive)  // do nothing if being is not alive
+		return;
+
 	//only compare if attackposition is set
 	if(attackposition->posx != 0 && attackposition->posy != 0){
 
 		// attack successful/failed
-		if(getRndNum(3)!=3)
+		if(getRndNum(2)!=2)
 			return;
 
 		// compare being position against attack
