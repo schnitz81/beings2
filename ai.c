@@ -28,26 +28,30 @@ void look_ahead(Being *beingToTurn)
 	}
 
 	Object surrounding[5][5];
-	chtype squareChar;
-	int squareAttrs;
+	char squareChar;
+	//chtype squareAttrs;
 	int squareCharColor;
 	int i,j;
 	for(j=0;j<=4;j++){	// Update obstacles of the current surroundings.
 		for(i=0;i<=4;i++){
 			squareChar = mvinch((beingToTurn->posy-2)+j,(beingToTurn->posx-2)+i) & A_CHARTEXT;  // Get square char.
-			squareAttrs = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_ATTRIBUTES;  // Get square attributes.
-			squareCharColor = (squareAttrs & A_COLOR) >> 16;  // Get square color.
+			//squareAttrs = mvinch((beingToTurn->posy-2)+j,(beingToTurn->posx-2)+i) & A_ATTRIBUTES;  // Get square attributes.
+			squareCharColor = mvinch((beingToTurn->posy-2)+j,(beingToTurn->posx-2)+i) & A_COLOR;
+			//squareCharColor = (squareAttrs & A_COLOR) >> 16;  // Get square color.
 			if(squareChar==' ')
 				surrounding[i][j] = NONE;
-			else if(squareChar=='*')
-				if(squareCharColor==beingToTurn->myColor)
+			else if(squareChar=='*'){
+				if(squareCharColor==COLOR_PAIR(beingToTurn->myColor))
 					surrounding[i][j] = TEAMBEING;
-				else if(squareCharColor==COLOR_CYAN)
-					surrounding[i][j] = FIGHTINGBEING;
-				else if(squareCharColor==COLOR_MAGENTA)
+				else if(squareCharColor==COLOR_PAIR(COLOR_CYAN))
+						surrounding[i][j] = FIGHTINGBEING;
+				else if(squareCharColor==COLOR_PAIR(COLOR_RED))
+						surrounding[i][j] = DAMAGEDBEING;
+				else if(squareCharColor==COLOR_PAIR(COLOR_MAGENTA))
 					surrounding[i][j] = NONE;
 				else
 					surrounding[i][j] = ENEMYBEING;
+			}
 			else if(squareChar=='=' || squareChar=='|' || squareChar=='#')
 				surrounding[i][j] = FENCE;
 		}
@@ -290,10 +294,13 @@ void decision_attack(Being *beingToTurn, Attackposition *attackposition)
 	look_ahead(beingToTurn);
 
 	bool firstCheck = TRUE;
+	
+	int loop=0;
 
 	// Keep deciding until the coast is clear.
 	while(firstCheck || (beingToTurn->obstacles.middlenear!=NONE && !beingToTurn->resting)){
 
+		loop++;
 		i = getRndNum(16);
 
 		// Try with an entirely new heading by 50% chance if first choice was blocked.
@@ -302,6 +309,8 @@ void decision_attack(Being *beingToTurn, Attackposition *attackposition)
 				beingToTurn->myHeading = getRndNum(8)-1;
 				beingToTurn->resting = FALSE;
 			}
+			else if(loop>=30)
+				beingToTurn->resting = TRUE; //stop trying to find a path forward after 30 tries to avoid infinite loop
 		}
 
 		// Change behaviour by own will (only one notch, no resting in attack mode).
@@ -372,11 +381,7 @@ void decision_attack(Being *beingToTurn, Attackposition *attackposition)
 
 		// Attack enemy logic *****************************************************************************************
 
-		// Fighting spotted logic
-		//if(beingToTurn->obstacles.leftfar==FIGHTINGBEING && beingToTurn->obstacles.leftnear==NONE)
-		//	beingToTurn->myHeading--;
-		//else if(beingToTurn->obstacles.rightfar==FIGHTINGBEING && beingToTurn->obstacles.rightnear==NONE)
-		//	beingToTurn->myHeading++;
+
 
 
 		// enemy far
@@ -384,22 +389,30 @@ void decision_attack(Being *beingToTurn, Attackposition *attackposition)
 			beingToTurn->myHeading--;
 		else if(beingToTurn->obstacles.rightfar==ENEMYBEING && beingToTurn->obstacles.rightnear==NONE)
 			beingToTurn->myHeading++;
+		
+		// Fighting spotted far logic
+		else if((beingToTurn->obstacles.leftfar==FIGHTINGBEING || beingToTurn->obstacles.leftfar==DAMAGEDBEING) && beingToTurn->obstacles.leftnear==NONE)
+			beingToTurn->myHeading--;
+		else if((beingToTurn->obstacles.rightfar==FIGHTINGBEING || beingToTurn->obstacles.rightfar==DAMAGEDBEING) && beingToTurn->obstacles.rightnear==NONE)
+			beingToTurn->myHeading++;
 
 
 		// enemy near - high prio - strike
 		// check for enemy near in all directions
 		//Object surrounding[3][3];
-		chtype squareChar;
-		int squareAttrs;
+		char squareChar;
+		//chtype squareAttrs;
 		int squareCharColor;
 		for(j=0;j<=2;j++){  // Update obstacles of the current surroundings.
 			for(i=0;i<=2;i++){
 				if(i==1&&j==1)  // selfskip
 					continue;
 				squareChar = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_CHARTEXT;  // Get square char.
-				squareAttrs = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_ATTRIBUTES;  // Get square attributes.
-				squareCharColor = (squareAttrs & A_COLOR) >> 16;  // Get square char.
-				if(squareChar=='*' && !beingToTurn->isHit && squareCharColor!=beingToTurn->myColor && squareCharColor!=COLOR_CYAN && squareCharColor!=COLOR_RED && squareCharColor!=COLOR_MAGENTA){
+				//squareAttrs = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_ATTRIBUTES;  // Get square attributes.
+				//squareCharColor = (squareAttrs & A_COLOR) >> 16;  // Get square char.
+				squareCharColor = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_COLOR;  // Get square char.
+				if(squareChar=='*' && !beingToTurn->isHit && squareCharColor!=COLOR_PAIR(beingToTurn->myColor) && squareCharColor!=COLOR_PAIR(COLOR_CYAN) && squareCharColor!=COLOR_PAIR(COLOR_RED)
+						&& squareCharColor!=COLOR_PAIR(COLOR_MAGENTA)){
 					if(getRndNum(2)==2){  // successful attack attempt
 						beingToTurn->fighting = TRUE;
 						attackposition->posy = (beingToTurn->posy-1)+j;
