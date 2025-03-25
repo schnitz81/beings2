@@ -113,7 +113,7 @@ void turnBeing(Being *beingToTurn, Attackposition *attackposition)
 
 	if(!beingToTurn->alive)  // do nothing if being is not alive
 		return;
-	else if(beingToTurn->isHit){  // skip turn if hit
+	else if(beingToTurn->isHit){  // skip turn if hit (stunned for 1 turn)
 		beingToTurn->isHit = FALSE;
 		return;
 	}
