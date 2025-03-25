@@ -2,7 +2,7 @@
 #define BEING_H
 
 
-typedef union attack_coordinates{
+typedef struct attack_coordinates{
 	int posy;
 	int posx;
 } Attackposition;

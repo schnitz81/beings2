@@ -233,7 +233,7 @@ void hitHandleBeing(Being *beingToHitcheck, Attackposition *attackposition)
 void runWorld()
 {
 	unsigned int nbrOfGreenBeings, nbrOfBlueBeings;
-	int i, simulationSpeed;
+	int i, j, simulationSpeed;
 	Attackposition attackposition;
 	// int newBeingToSpawnNbr;  ////////////////////////////////////////////////////////////////  used in create/remove
 	//bool beingCreated;    ////////////////////////////////////////////////////////////////  used in create/remove
@@ -260,17 +260,19 @@ void runWorld()
 	while(ch != 27){
 		ch=getch();
 
-		// handle attack hits on all beings
-		for(i=0;i<nbrOfGreenBeings;i++)
-			hitHandleBeing(&greenBeings[i], &attackposition);
-		for(i=0;i<nbrOfBlueBeings;i++)
-			hitHandleBeing(&blueBeings[i], &attackposition);
-
 		// turn all beings
-		for(i=0;i<nbrOfGreenBeings;i++)
+		for(i=0;i<nbrOfGreenBeings;i++){
 			turnBeing(&greenBeings[i], &attackposition);
-		for(i=0;i<nbrOfBlueBeings;i++)
+			// handle attack hits on all enemy beings
+			for(j=0;j<nbrOfBlueBeings;j++)
+				hitHandleBeing(&blueBeings[j], &attackposition);
+		}
+		for(i=0;i<nbrOfBlueBeings;i++){
 			turnBeing(&blueBeings[i], &attackposition);
+			// handle attack hits on all enemy beings
+			for(j=0;j<nbrOfGreenBeings;j++)
+				hitHandleBeing(&greenBeings[j], &attackposition);
+		}
 		refresh();
 
 		// Change simulation speed or number of beings during run.
