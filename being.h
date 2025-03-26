@@ -33,6 +33,7 @@ typedef struct being{
 	MyColor myColor;
 	bool fighting;
 	bool isHit;
+	struct being *next;
 } Being;
 
 

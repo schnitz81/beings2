@@ -42,7 +42,7 @@ void beingToPrint(const Being *beingToPrint)
 }
 
 
-int spawnBeing(Being *beingToGiveLife, const int *beingNbr, const MyColor *myColor)
+Being spawnBeing(Being *beingToGiveLife, const int *beingNbr, const MyColor *myColor)
 {
 	//choose coordinate without obstacle or other being
 	bool coordinateIsClear = FALSE;
@@ -61,10 +61,13 @@ int spawnBeing(Being *beingToGiveLife, const int *beingNbr, const MyColor *myCol
 	beingToPrint(beingToGiveLife);
 
 	// return false if position is not found
-	if(positionFreeTest >= 10000000)
-		return 0;
+	if(positionFreeTest >= 10000000){
+		endwin();
+		printf("\nError: No space for all beings to spawn. Try a lower number or make the terminal window larger.\n");
+		exit(1);
+	}
 	else
-		return 1;
+		return beingToGiveLife;
 }
 
 
