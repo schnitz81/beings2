@@ -156,10 +156,9 @@ unsigned int getNbrOfBeings(const MyColor *myColor)
 }
 
 
-unsigned int spawnBeings(Being *beings, const unsigned int *nbrOfBeings, const MyColor *beingColor)
+void spawnBeings(Being *beingsCursor, const unsigned int *nbrOfBeings, const MyColor *beingColor)
 {
 	int i;
-	unsigned int actualNbrOfBeings = 0;
 	bool beingCreated;
 	for(i=0;i<*nbrOfBeings;i++){  // Spawn all beings.
 		usleep(300);  // delay
@@ -168,15 +167,12 @@ unsigned int spawnBeings(Being *beings, const unsigned int *nbrOfBeings, const M
 			beings = realloc(beings,actualNbrOfBeings*sizeof(Being));
 			break;
 		}
-		else
-			actualNbrOfBeings++;
 		//if(i==0){  // Set special color on genesis being.
 		//	beings[0].myColor=15;
 		//	turnBeing(&beings[i], &i);
 		//}
 		refresh();
 	}
-	return actualNbrOfBeings;
 }
 
 
@@ -243,12 +239,13 @@ void runWorld()
 	attackposition.posx = 0;
 	greenBeingColor = GREEN;
 	nbrOfGreenBeings = getNbrOfBeings(&greenBeingColor);
-	Being *greenBeings = malloc(nbrOfGreenBeings*sizeof(Being));
-	nbrOfGreenBeings = spawnBeings(&*greenBeings,&nbrOfGreenBeings,&greenBeingColor);
+	Being head;
+	Being *greenBeingsCursor = head;  // = malloc(nbrOfGreenBeings*sizeof(Being));
+	spawnBeings(&*greenBeingsCursor,&nbrOfGreenBeings,&greenBeingColor);
 	blueBeingColor = BLUE;
 	nbrOfBlueBeings = getNbrOfBeings(&blueBeingColor);
 	Being *blueBeings = malloc(nbrOfBlueBeings*sizeof(Being));
-	nbrOfBlueBeings = spawnBeings(&*blueBeings,&nbrOfBlueBeings,&blueBeingColor);
+	spawnBeings(&*blueBeings,&nbrOfBlueBeings,&blueBeingColor);
 	drawOuterWall();
 	simulationSpeed = setSimulationSpeed();
 	mvprintw(maxy-1,(maxx/2)-19," Press Enter to start simulation. ");

@@ -25,6 +25,7 @@ void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const 
 	beingToGiveLife->myColor = *myColor;
 	beingToGiveLife->fighting = FALSE;
 	beingToGiveLife->isHit = FALSE;
+	beingToGiveLife->next = NULL;
 }
 
 
@@ -42,7 +43,7 @@ void beingToPrint(const Being *beingToPrint)
 }
 
 
-Being spawnBeing(Being *beingToGiveLife, const int *beingNbr, const MyColor *myColor)
+void spawnBeing(Being *beingsCursor, const int *nbrOfBeings, const MyColor *myColor)
 {
 	//choose coordinate without obstacle or other being
 	bool coordinateIsClear = FALSE;
@@ -55,19 +56,29 @@ Being spawnBeing(Being *beingToGiveLife, const int *beingNbr, const MyColor *myC
 		testy = getRndNum(maxy-1);
 		coordinateIsClear = checkIfCoordinatesAreClear(&testx, &testy);
 	}
-	setBeingDefaults(beingToGiveLife,&testx,&testy,myColor);
 
 	// Initial placing of being.
-	beingToPrint(beingToGiveLife);
+	if(coordinateIsClear){
+		
+		// find last being in linked list
+		while(beingsCursor->next != NULL)
+			beingsCursor = beingsCursor->next;
+		
+		Being *beingToGiveLife = (Being*)malloc(sizeof(Being));
+		if beingToGiveLife == NULL){
+			printf("\nError creating a new being.\n");
+			exit(1);
+		}
+		setBeingDefaults(&beingToGiveLife,&testx,&testy,myColor);
+		beingsCursor->next = beingToGiveLife;
 
-	// return false if position is not found
-	if(positionFreeTest >= 10000000){
+		beingToPrint(beingToGiveLife);
+	}
+	else{  // if no place to spawn being is found
 		endwin();
 		printf("\nError: No space for all beings to spawn. Try a lower number or make the terminal window larger.\n");
 		exit(1);
 	}
-	else
-		return beingToGiveLife;
 }
 
 
