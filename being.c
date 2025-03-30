@@ -13,7 +13,7 @@ void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const 
 	beingToGiveLife->posx = *x;
 	beingToGiveLife->posy = *y;
 	beingToGiveLife->hitpoints = 10;
-	beingToGiveLife->alive = TRUE;
+	//beingToGiveLife->alive = TRUE;
 	beingToGiveLife->myHeading = getRndNum(8)-1;
 	beingToGiveLife->obstacles.leftfar = 0;
 	beingToGiveLife->obstacles.leftnear = 0;
@@ -43,7 +43,7 @@ void beingToPrint(const Being *beingToPrint)
 }
 
 
-void spawnBeing(Being *beingsCursor, const int *nbrOfBeings, const MyColor *myColor)
+void spawnBeing(Being *beingsCursor, const MyColor *myColor)
 {
 	//choose coordinate without obstacle or other being
 	bool coordinateIsClear = FALSE;
@@ -124,10 +124,7 @@ void movement(Being *beingToTurn)
 
 void turnBeing(Being *beingToTurn, Attackposition *attackposition)
 {
-
-	if(!beingToTurn->alive)  // do nothing if being is not alive
-		return;
-	else if(beingToTurn->isHit){  // skip turn if hit (stunned for 1 turn)
+	if(beingToTurn->isHit){  // skip turn if hit (stunned for 1 turn)
 		beingToTurn->isHit = FALSE;
 		return;
 	}
