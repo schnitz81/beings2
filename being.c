@@ -61,15 +61,17 @@ void spawnBeing(Being *beingsCursor, const MyColor *myColor)
 	if(coordinateIsClear){
 		
 		// find last being in linked list
-		while(beingsCursor->next != NULL)
-			beingsCursor = beingsCursor->next;
+		if(beingsCursor!=NULL){
+			while(beingsCursor->next != NULL)
+				beingsCursor = beingsCursor->next;
+		}
 		
 		Being *beingToGiveLife = (Being*)malloc(sizeof(Being));
-		if beingToGiveLife == NULL){
+		if(beingToGiveLife == NULL){
 			printf("\nError creating a new being.\n");
 			exit(1);
 		}
-		setBeingDefaults(&beingToGiveLife,&testx,&testy,myColor);
+		setBeingDefaults(beingToGiveLife,&testx,&testy,myColor);
 		beingsCursor->next = beingToGiveLife;
 
 		beingToPrint(beingToGiveLife);
@@ -85,7 +87,7 @@ void spawnBeing(Being *beingsCursor, const MyColor *myColor)
 void movement(Being *beingToTurn)
 {
 	// only move if alive and not resting or fighting
-	if(beingToTurn->alive==TRUE && !beingToTurn->resting && !beingToTurn->fighting){
+	if(!beingToTurn->resting && !beingToTurn->fighting){
 		switch(beingToTurn->myHeading){
 			case UP:
 				beingToTurn->posy--;
