@@ -41,7 +41,7 @@ typedef struct being{
 
 void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const MyColor *myColor);
 void beingToPrint(const Being *beingToPrint);
-Being *spawnBeing(Being *beingsCursor, const MyColor *myColor);
+void spawnBeing(Being *beingsCursor, const MyColor *myColor);
 void movement(Being *beingToTurn);
 void turnBeing(Being *beingToTurn, Attackposition *attackposition);
 //bool isEnemy(Being *beingMe, const int *targetx, const int *targety);
