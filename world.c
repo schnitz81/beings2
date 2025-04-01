@@ -258,23 +258,27 @@ void runWorld()
 	attackposition.posx = 0;
 	greenBeingColor = GREEN;
 	nbrOfGreenBeings = getNbrOfBeings(&greenBeingColor);
-	Being *greenBeingsHead = NULL;
-	Being *greenBeingsCursor = NULL;
+	Being *greenBeingsHead = (Being*)malloc(sizeof(Being));
+	Being *greenBeingsCursor = (Being*)malloc(sizeof(Being));
 	//spawnBeing(greenBeingsHead, &greenBeingColor);  // spawn first being
 	//*greenBeingsCursor = *greenBeingsHead;  // = malloc(nbrOfGreenBeings*sizeof(Being));
-	Being *greenBeingsPrev = NULL;
+	Being *greenBeingsPrev = (Being*)malloc(sizeof(Being));
 	//spawnBeings(&*greenBeingsCursor,&nbrOfGreenBeings,&greenBeingColor);
-	for(i=0;i<nbrOfGreenBeings;i++)
-		spawnBeing(greenBeingsCursor, &greenBeingColor);
+	for(i=0;i<nbrOfGreenBeings;i++){
+		greenBeingsHead = spawnBeing(greenBeingsHead, &greenBeingColor);
+		usleep(300);  // delay
+	}
 	blueBeingColor = BLUE;
 	nbrOfBlueBeings = getNbrOfBeings(&blueBeingColor);
-	Being *blueBeingsHead = NULL;
-	Being *blueBeingsCursor = NULL;
-	*blueBeingsCursor = *blueBeingsHead;
-	Being *blueBeingsPrev = NULL;
+	Being *blueBeingsHead = (Being*)malloc(sizeof(Being));
+	Being *blueBeingsCursor = (Being*)malloc(sizeof(Being));
+	//*blueBeingsCursor = *blueBeingsHead;
+	Being *blueBeingsPrev = (Being*)malloc(sizeof(Being));
 	//spawnBeings(&*blueBeingsCursor,&nbrOfBlueBeings,&blueBeingColor);
-	for(i=0;i<nbrOfBlueBeings;i++)
-		spawnBeing(&*blueBeingsCursor, &blueBeingColor);
+	for(i=0;i<nbrOfBlueBeings;i++){
+		blueBeingsHead = spawnBeing(blueBeingsHead, &blueBeingColor);
+		usleep(300);  // delay
+	}
 	drawOuterWall();
 	simulationSpeed = setSimulationSpeed();
 	mvprintw(maxy-1,(maxx/2)-19," Press Enter to start simulation. ");
@@ -285,23 +289,23 @@ void runWorld()
 	int ch = 0;
 	while(ch != 27){
 		ch=getch();
-		*greenBeingsCursor = *greenBeingsHead;
-		*blueBeingsCursor = *blueBeingsHead;
+		greenBeingsCursor = greenBeingsHead;
+		blueBeingsCursor = blueBeingsHead;
 		// turn all beings
 		while(greenBeingsCursor->next!=NULL){
 			turnBeing(greenBeingsCursor, &attackposition);
 			greenBeingsCursor = greenBeingsCursor->next;
 			// handle attack hits on all enemy beings
 			//for(j=0;j<nbrOfBlueBeings;j++)
-			blueBeingsPrev = blueBeingsCursor;  // reset prev pointer
+			//blueBeingsPrev = blueBeingsCursor;  // reset prev pointer
 			while(blueBeingsCursor->next!=NULL){
 				hitHandleBeing(blueBeingsPrev, blueBeingsHead, blueBeingsCursor, &attackposition);
 				blueBeingsPrev = blueBeingsCursor;
 				blueBeingsCursor = blueBeingsCursor->next;
 			}
 		}
-		*greenBeingsCursor = *greenBeingsHead;
-		*blueBeingsCursor = *blueBeingsHead;
+		greenBeingsCursor = greenBeingsHead;
+		blueBeingsCursor = blueBeingsHead;
 		//for(i=0;i<nbrOfBlueBeings;i++){
 		while(blueBeingsCursor->next!=NULL){
 			turnBeing(blueBeingsCursor, &attackposition);
