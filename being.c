@@ -43,15 +43,15 @@ void beingToPrint(const Being *beingToPrint)
 }
 
 
-void spawnBeing(Being *beingsHead, const MyColor *myColor)
+void spawnBeing(Being *beingsCursor, const MyColor *myColor)
 {
 	//choose coordinate without obstacle or other being
 	bool coordinateIsClear = FALSE;
 	int testx;
 	int testy;
 	unsigned long int positionFreeTest = 0;
-	Being *beingsCursor = (Being*)malloc(sizeof(Being));
-	beingsCursor = beingsHead;
+	//Being *beingsCursor = (Being*)malloc(sizeof(Being));
+	//beingsCursor = beingsHead;
 	
 	while(!coordinateIsClear && positionFreeTest < 10000000){
 		positionFreeTest++;
@@ -63,7 +63,7 @@ void spawnBeing(Being *beingsHead, const MyColor *myColor)
 	// Initial placing of being.
 	if(coordinateIsClear){
 		
-		Being *beingToGiveLife = (Being*)malloc(sizeof(Being));
+		Being *beingToGiveLife = malloc(sizeof(Being));
 		if(beingToGiveLife == NULL){
 			endwin();
 			printf("\nError creating a new being.\n");

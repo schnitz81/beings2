@@ -191,7 +191,7 @@ void hitHandleBeing(Being *beingPrev, Being *beingToHitCheck, Attackposition *at
 
 	//if(!beingToHitCheck->alive)  // do nothing if being is not alive
 	//	return;
-	
+
 	//only compare if attackposition is set
 	if(attackposition->posx != 0 && attackposition->posy != 0){
 
@@ -217,7 +217,7 @@ void hitHandleBeing(Being *beingPrev, Being *beingToHitCheck, Attackposition *at
 				mvprintw(beingToHitCheck->posy,beingToHitCheck->posx,"*");
 				attroff(COLOR_PAIR(COLOR_MAGENTA));
 				//beingToHitcheck->alive=FALSE;  // not alive when hitpoints reach zero
-				
+
 				// first being
 				if(beingPrev==beingToHitCheck){
 					if(beingToHitCheck->next!=NULL)
@@ -259,29 +259,41 @@ void runWorld()
 	attackposition.posx = 0;
 	greenBeingColor = GREEN;
 	nbrOfGreenBeings = getNbrOfBeings(&greenBeingColor);
-	Being *greenBeingsHead = (Being*)malloc(sizeof(Being));
-	Being *greenBeingsCursor = (Being*)malloc(sizeof(Being));
-	
-	
-	
+	Being *greenBeingsHead = NULL;
+	Being *greenBeingsCursor = NULL;
+
+
+
 	//spawnBeing(greenBeingsHead, &greenBeingColor);  // spawn first being
 	//*greenBeingsCursor = *greenBeingsHead;  // = malloc(nbrOfGreenBeings*sizeof(Being));
-	Being *greenBeingsPrev = (Being*)malloc(sizeof(Being));
+	Being *greenBeingsPrev = NULL;
+
+
+
+	greenBeingsCursor = greenBeingsHead;
+
+
+
 	//spawnBeings(&*greenBeingsCursor,&nbrOfGreenBeings,&greenBeingColor);
 	for(i=0;i<nbrOfGreenBeings;i++){
-		spawnBeing(greenBeingsHead, &greenBeingColor);
+		spawnBeing(greenBeingsCursor, &greenBeingColor);
 		usleep(300);  // delay
 	}
 	blueBeingColor = BLUE;
 	nbrOfBlueBeings = getNbrOfBeings(&blueBeingColor);
-	Being *blueBeingsHead = (Being*)malloc(sizeof(Being));
-	Being *blueBeingsCursor = (Being*)malloc(sizeof(Being));
+	Being *blueBeingsHead = NULL;
+	Being *blueBeingsCursor = NULL;
 	//*blueBeingsCursor = *blueBeingsHead;
-	Being *blueBeingsPrev = (Being*)malloc(sizeof(Being));
+	Being *blueBeingsPrev = NULL;
 	//spawnBeings(&*blueBeingsCursor,&nbrOfBlueBeings,&blueBeingColor);
+
+
+	blueBeingsCursor = blueBeingsHead;
+
+
 	for(i=0;i<nbrOfBlueBeings;i++){
-		//blueBeingsHead = 
-		spawnBeing(blueBeingsHead, &blueBeingColor);
+		//blueBeingsHead =
+		spawnBeing(blueBeingsCursor, &blueBeingColor);
 		usleep(300);  // delay
 	}
 	drawOuterWall();
@@ -297,13 +309,13 @@ void runWorld()
 		greenBeingsCursor = greenBeingsHead;
 		blueBeingsCursor = blueBeingsHead;
 		// turn all beings
-		while(greenBeingsCursor->next!=NULL){
+		while(greenBeingsCursor!=NULL){
 			turnBeing(greenBeingsCursor, &attackposition);
 			greenBeingsCursor = greenBeingsCursor->next;
 			// handle attack hits on all enemy beings
 			//for(j=0;j<nbrOfBlueBeings;j++)
 			blueBeingsPrev = blueBeingsCursor;  // reset prev pointer
-			while(blueBeingsCursor->next!=NULL){
+			while(blueBeingsCursor!=NULL){
 				hitHandleBeing(blueBeingsPrev, blueBeingsCursor, &attackposition);
 				blueBeingsPrev = blueBeingsCursor;
 				blueBeingsCursor = blueBeingsCursor->next;
@@ -312,13 +324,13 @@ void runWorld()
 		greenBeingsCursor = greenBeingsHead;
 		blueBeingsCursor = blueBeingsHead;
 		//for(i=0;i<nbrOfBlueBeings;i++){
-		while(blueBeingsCursor->next!=NULL){
+		while(blueBeingsCursor!=NULL){
 			turnBeing(blueBeingsCursor, &attackposition);
 			blueBeingsCursor = blueBeingsCursor->next;
 			// handle attack hits on all enemy beings
 			//for(j=0;j<nbrOfGreenBeings;j++)
 			greenBeingsPrev = greenBeingsCursor;  // reset prev pointer
-			while(greenBeingsCursor->next!=NULL){
+			while(greenBeingsCursor!=NULL){
 				hitHandleBeing(greenBeingsPrev, greenBeingsCursor, &attackposition);
 				greenBeingsPrev = greenBeingsCursor;
 				greenBeingsCursor = greenBeingsCursor->next;
@@ -361,12 +373,12 @@ void runWorld()
 		//}
 		usleep(1000000/simulationSpeed);
 	}
-	free(greenBeingsHead);
-	free(greenBeingsCursor);
-	free(greenBeingsPrev);
-	free(blueBeingsHead);
-	free(blueBeingsCursor);
-	free(blueBeingsPrev);
+	//free(greenBeingsHead);
+	//free(greenBeingsCursor);
+	//free(greenBeingsPrev);
+	//free(blueBeingsHead);
+	//free(blueBeingsCursor);
+	//free(blueBeingsPrev);
 	getch();
 	endwin();
 }
