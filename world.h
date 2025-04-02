@@ -21,7 +21,7 @@ unsigned int getMaxNbrOfBeings();
 unsigned int getNbrOfBeings();
 //void spawnBeings(Being *beingsCursor, const unsigned int *nbrOfBeings, const MyColor *beingColor);
 int setSimulationSpeed();
-void hitHandleBeing(Being *beingPrev, Being *beingToHitcheckCursor, Attackposition *attackposition);
+bool hitHandleBeing(Being *beingPrev, Being *beingToHitcheckCursor, Attackposition *attackposition);
 void runWorld();
 bool checkIfCoordinatesAreClear(const int *x, const int *y);
 

@@ -12,7 +12,7 @@ void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const 
 	// Initialize values of new being.
 	beingToGiveLife->posx = *x;
 	beingToGiveLife->posy = *y;
-	beingToGiveLife->hitpoints = 10;
+	beingToGiveLife->hitpoints = 3;
 	//beingToGiveLife->alive = TRUE;
 	beingToGiveLife->myHeading = getRndNum(8)-1;
 	beingToGiveLife->obstacles.leftfar = 0;
