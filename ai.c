@@ -35,9 +35,7 @@ void look_ahead(Being *beingToTurn)
 	for(j=0;j<=4;j++){	// Update obstacles of the current surroundings.
 		for(i=0;i<=4;i++){
 			squareChar = mvinch((beingToTurn->posy-2)+j,(beingToTurn->posx-2)+i) & A_CHARTEXT;  // Get square char.
-			//squareAttrs = mvinch((beingToTurn->posy-2)+j,(beingToTurn->posx-2)+i) & A_ATTRIBUTES;  // Get square attributes.
 			squareCharColor = mvinch((beingToTurn->posy-2)+j,(beingToTurn->posx-2)+i) & A_COLOR;
-			//squareCharColor = (squareAttrs & A_COLOR) >> 16;  // Get square color.
 			if(squareChar==' ')
 				surrounding[i][j] = NONE;
 			else if(squareChar=='*'){
@@ -256,7 +254,6 @@ void decision_peaceful(Being *beingToTurn)
 						beingToTurn->myHeading++;
 				}
 			}
-
 		}
 
 		// Look towards path ahead for obstacles.
@@ -329,10 +326,8 @@ void decision_attack(Being *beingToTurn, Attackposition *attackposition)
 		// If another being is far away.
 		if(beingToTurn->obstacles.leftnear==NONE && beingToTurn->obstacles.middlenear==NONE && beingToTurn->obstacles.rightnear==NONE){
 			// being obstacle far left.
-			if(beingToTurn->obstacles.leftfar==TEAMBEING && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==NONE){
-				if(beingToTurn)
-					beingToTurn->myHeading++;
-			}
+			if(beingToTurn->obstacles.leftfar==TEAMBEING && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==NONE)
+				beingToTurn->myHeading++;
 			// being obstacle far right
 			else if(beingToTurn->obstacles.leftfar==NONE && beingToTurn->obstacles.middlefar==NONE && beingToTurn->obstacles.rightfar==TEAMBEING)
 				beingToTurn->myHeading--;
@@ -344,14 +339,6 @@ void decision_attack(Being *beingToTurn, Attackposition *attackposition)
 					beingToTurn->myHeading++;
 			}
 		}
-
-		// Likely stop if being is close ahead.
-		//if(beingToTurn->obstacles.leftnear==TEAMBEING || beingToTurn->obstacles.middlenear==TEAMBEING || beingToTurn->obstacles.rightnear==TEAMBEING ||
-		//	beingToTurn->obstacles.leftnear==ENEMYBEING || beingToTurn->obstacles.middlenear==ENEMYBEING || beingToTurn->obstacles.rightnear==ENEMYBEING){
-		//	if(getRndNum(4)!=4)
-		//		beingToTurn->resting = TRUE;
-		//}
-
 
 		// ********************************************************************************************************
 
@@ -379,10 +366,8 @@ void decision_attack(Being *beingToTurn, Attackposition *attackposition)
 		// Look towards path ahead for obstacles.
 		look_ahead(beingToTurn);
 
+
 		// Attack enemy logic *****************************************************************************************
-
-
-
 
 		// enemy far
 		if(beingToTurn->obstacles.leftfar==ENEMYBEING && beingToTurn->obstacles.leftnear==NONE)
@@ -399,7 +384,6 @@ void decision_attack(Being *beingToTurn, Attackposition *attackposition)
 
 		// enemy near - high prio - strike
 		// check for enemy near in all directions
-		//Object surrounding[3][3];
 		char squareChar;
 		//chtype squareAttrs;
 		int squareCharColor;
@@ -408,8 +392,6 @@ void decision_attack(Being *beingToTurn, Attackposition *attackposition)
 				if(i==1&&j==1)  // selfskip
 					continue;
 				squareChar = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_CHARTEXT;  // Get square char.
-				//squareAttrs = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_ATTRIBUTES;  // Get square attributes.
-				//squareCharColor = (squareAttrs & A_COLOR) >> 16;  // Get square char.
 				squareCharColor = mvinch((beingToTurn->posy-1)+j,(beingToTurn->posx-1)+i) & A_COLOR;  // Get square char.
 				if(squareChar=='*' && !beingToTurn->isHit && squareCharColor!=COLOR_PAIR(beingToTurn->myColor) && squareCharColor!=COLOR_PAIR(COLOR_CYAN) && squareCharColor!=COLOR_PAIR(COLOR_RED)
 						&& squareCharColor!=COLOR_PAIR(COLOR_MAGENTA)){

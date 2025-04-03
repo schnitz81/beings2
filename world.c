@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-//#include <sys/ioctl.h>
 #include "world.h"
 #include "event.h"
 #include "being.h"
@@ -50,7 +49,6 @@ void placeObstacles()
 	bool bLast, bOneMade = FALSE;
 
 	// User chooses obstacle density.
-
 	while(obstacleDensity<0||obstacleDensity>50){
 		mvprintw(maxy-1,(maxx/2)-18," Enter obstacle density (0-50):    ");
 		getyx(stdscr,y,x);
@@ -156,22 +154,6 @@ unsigned int getNbrOfBeings(const MyColor *myColor)
 }
 
 
-//void spawnBeings(Being *beingsCursor, const unsigned int *nbrOfBeings, const MyColor *beingColor)
-//{
-//	int i;
-//	bool beingCreated;
-//	for(i=0;i<*nbrOfBeings;i++){  // Spawn all beings.
-//		usleep(300);  // delay
-//		spawnBeing(&beings[i], &i, beingColor);
-//		//if(i==0){  // Set special color on genesis being.
-//		//	beings[0].myColor=15;
-//		//	turnBeing(&beings[i], &i);
-//		//}
-//		refresh();
-//	}
-//}
-
-
 int setSimulationSpeed()
 {
 	int simulationSpeed = 0, y, x;
@@ -188,10 +170,6 @@ int setSimulationSpeed()
 
 bool hitHandleBeing(Being *beingPrev, Being *beingToHitCheck, Attackposition *attackposition)
 {
-
-	//if(!beingToHitCheck->alive)  // do nothing if being is not alive
-	//	return;
-
 	//only compare if attackposition is set
 	if(attackposition->posx != 0 && attackposition->posy != 0){
 
@@ -216,7 +194,6 @@ bool hitHandleBeing(Being *beingPrev, Being *beingToHitCheck, Attackposition *at
 				attron(COLOR_PAIR(COLOR_MAGENTA));
 				mvprintw(beingToHitCheck->posy,beingToHitCheck->posx,"*");
 				attroff(COLOR_PAIR(COLOR_MAGENTA));
-				//beingToHitcheck->alive=FALSE;  // not alive when hitpoints reach zero
 
 				// first being
 				if(beingPrev==beingToHitCheck){
@@ -254,8 +231,6 @@ void runWorld()
 	unsigned int nbrOfGreenBeings, nbrOfBlueBeings;
 	int i, simulationSpeed;
 	Attackposition attackposition;
-	// int newBeingToSpawnNbr;  ////////////////////////////////////////////////////////////////  used in create/remove
-	//bool beingCreated;    ////////////////////////////////////////////////////////////////  used in create/remove
 	MyColor greenBeingColor, blueBeingColor;
 	gamemode = FREEROAM;
 	attackposition.posy = 0;
@@ -267,31 +242,24 @@ void runWorld()
 	Being *greenBeingsCursor = malloc(sizeof(Being));
 	Being *greenBeingsPrev = malloc(sizeof(Being));
 
-	//greenBeingsHead = NULL;
 	greenBeingsCursor = greenBeingsHead;
-	//greenBeingsPrev = NULL;
 
-
-	//spawnBeings(&*greenBeingsCursor,&nbrOfGreenBeings,&greenBeingColor);
 	for(i=0;i<nbrOfGreenBeings;i++){
 		spawnBeing(greenBeingsCursor, &greenBeingColor);
+		refresh();
 		usleep(300);  // delay
 	}
 	blueBeingColor = BLUE;
 	nbrOfBlueBeings = getNbrOfBeings(&blueBeingColor);
 	Being *blueBeingsHead = malloc(sizeof(Being));
 	Being *blueBeingsCursor = malloc(sizeof(Being));
-	//*blueBeingsCursor = *blueBeingsHead;
 	Being *blueBeingsPrev = malloc(sizeof(Being));
-	//spawnBeings(&*blueBeingsCursor,&nbrOfBlueBeings,&blueBeingColor);
 
-	//blueBeingsHead = NULL;
 	blueBeingsCursor = blueBeingsHead;
-	//blueBeingsPrev = NULL;
 
 	for(i=0;i<nbrOfBlueBeings;i++){
-		//blueBeingsHead =
 		spawnBeing(blueBeingsCursor, &blueBeingColor);
+		refresh();
 		usleep(300);  // delay
 	}
 	drawOuterWall();
@@ -310,31 +278,30 @@ void runWorld()
 		while(greenBeingsCursor->next!=NULL){
 			turnBeing(greenBeingsCursor->next, &attackposition);
 			greenBeingsCursor = greenBeingsCursor->next;
-			// handle attack hits on all enemy beings
-			//for(j=0;j<nbrOfBlueBeings;j++)
 			blueBeingsCursor = blueBeingsHead;
 			blueBeingsPrev = blueBeingsCursor;  // reset prev pointer
 			beingDestroyed = FALSE;
-			while(blueBeingsCursor->next!=NULL){
+			while(blueBeingsCursor->next!=NULL){  // compare all opponents against attack coordinates
 				blueBeingsCursor = blueBeingsCursor->next;
 				beingDestroyed = hitHandleBeing(blueBeingsPrev, blueBeingsCursor, &attackposition);
 				if(beingDestroyed)
 					break;
 				blueBeingsPrev = blueBeingsCursor;
 			}
+			// reset attack coordinates after every failed attack
+			attackposition.posy = 0;
+			attackposition.posx = 0;
 		}
 
 		blueBeingsCursor = blueBeingsHead;
-		//for(i=0;i<nbrOfBlueBeings;i++){
 		while(blueBeingsCursor->next!=NULL){
 			turnBeing(blueBeingsCursor->next, &attackposition);
 			blueBeingsCursor = blueBeingsCursor->next;
 			// handle attack hits on all enemy beings
-			//for(j=0;j<nbrOfGreenBeings;j++)
 			greenBeingsCursor = greenBeingsHead;
 			greenBeingsPrev = greenBeingsCursor;  // reset prev pointer
 			beingDestroyed = FALSE;
-			while(greenBeingsCursor->next!=NULL){
+			while(greenBeingsCursor->next!=NULL){  // compare all opponents against attack coordinates
 				greenBeingsCursor = greenBeingsCursor->next;
 				beingDestroyed = hitHandleBeing(greenBeingsPrev, greenBeingsCursor, &attackposition);
 				if(beingDestroyed)
@@ -342,6 +309,9 @@ void runWorld()
 				greenBeingsPrev = greenBeingsCursor;
 				
 			}
+			// reset attack coordinates after every failed attack
+			attackposition.posy = 0;
+			attackposition.posx = 0;
 		}
 		refresh();
 
@@ -359,25 +329,6 @@ void runWorld()
 		else if(ch=='a' || ch=='A')
 			gamemode = ATTACK;
 
-
-
-
-		// Create and remove beings during run.
-		//if(ch==',' && nbrOfBeings > 1){
-		//	mvprintw(beings[nbrOfBeings-1].posy,beings[nbrOfBeings-1].posx," ");  // Erase last being.
-		//	nbrOfBeings--;
-		//	beings = realloc(beings,nbrOfBeings*sizeof(Being));
-		//}
-		//else if(ch=='.' && nbrOfBeings < 65535){  // Create new being.
-		//	nbrOfBeings++;
-		//	beings = realloc(beings,nbrOfBeings*sizeof(Being));
-		//	newBeingToSpawnNbr = nbrOfBeings - 1;
-		//	beingCreated = spawnBeing(&beings[newBeingToSpawnNbr], &newBeingToSpawnNbr);
-		//	if(beingCreated==FALSE){ // If being created is unsuccessful due to out of space.
-		//		nbrOfBeings--;
-		//		beings = realloc(beings,nbrOfBeings*sizeof(Being));
-		//	}
-		//}
 		usleep(1000000/simulationSpeed);
 	}
 	//free(greenBeingsHead);
