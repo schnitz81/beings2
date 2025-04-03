@@ -272,9 +272,8 @@ void runWorld()
 	int ch = 0;
 	while(ch != 27){
 		ch=getch();
-		greenBeingsCursor = greenBeingsHead;
-
 		// turn all beings
+		greenBeingsCursor = greenBeingsHead;
 		while(greenBeingsCursor->next!=NULL){
 			turnBeing(greenBeingsCursor->next, &attackposition);
 			greenBeingsCursor = greenBeingsCursor->next;
