@@ -109,11 +109,11 @@ void placeObstacles()
 
 void buildWorld()
 {
+	srand(time(NULL));  // world and actions will be generated randomly.
 	initscr();
 	curs_set(0);
 	start_color();
 	use_default_colors();
-	srand(time(NULL));  // world will be generated randomly.
 	getmaxyx(stdscr,maxy,maxx); // set world outer boundaries (global var)
 	if(maxy<20 || maxx<40){  // If terminal window is too small.
 		endwin();
