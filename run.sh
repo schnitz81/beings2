@@ -10,12 +10,12 @@
     echo "Proceeding to build executable..."; sleep .1
 
 	echo 'Building...'
-	gcc -v -Wfatal-errors -Wall -c main.c &&
-	gcc -v -Wfatal-errors -Wall -c world.c &&
-	gcc -v -Wfatal-errors -Wall -c ai.c &&
-	gcc -v -Wfatal-errors -Wall -c event.c &&
-	gcc -v -Wfatal-errors -Wall -c being.c &&
-	gcc -v -Wfatal-errors -o beings main.o world.o ai.o event.o being.o -lncurses -ltinfo 
+	gcc -g -v -Wfatal-errors -Wall -c main.c &&
+	gcc -g -v -Wfatal-errors -Wall -c world.c &&
+	gcc -g -v -Wfatal-errors -Wall -c ai.c &&
+	gcc -g -v -Wfatal-errors -Wall -c event.c &&
+	gcc -g -v -Wfatal-errors -Wall -c being.c &&
+	gcc -g -v -Wfatal-errors -o beings main.o world.o ai.o event.o being.o -lncurses -ltinfo 
 
 	if [ $? -eq 0 ]; then
 		echo "Build successful."

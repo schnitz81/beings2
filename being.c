@@ -12,8 +12,7 @@ void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const 
 	// Initialize values of new being.
 	beingToGiveLife->posx = *x;
 	beingToGiveLife->posy = *y;
-	beingToGiveLife->hitpoints = 10;
-	beingToGiveLife->alive = TRUE;
+	beingToGiveLife->hitpoints = 3;
 	beingToGiveLife->myHeading = getRndNum(8)-1;
 	beingToGiveLife->obstacles.leftfar = 0;
 	beingToGiveLife->obstacles.leftnear = 0;
@@ -25,6 +24,7 @@ void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const 
 	beingToGiveLife->myColor = *myColor;
 	beingToGiveLife->fighting = FALSE;
 	beingToGiveLife->isHit = FALSE;
+	beingToGiveLife->next = NULL;
 }
 
 
@@ -42,36 +42,55 @@ void beingToPrint(const Being *beingToPrint)
 }
 
 
-int spawnBeing(Being *beingToGiveLife, const int *beingNbr, const MyColor *myColor)
+void spawnBeing(Being *beingsCursor, const MyColor *myColor)
 {
 	//choose coordinate without obstacle or other being
 	bool coordinateIsClear = FALSE;
 	int testx;
 	int testy;
 	unsigned long int positionFreeTest = 0;
+
 	while(!coordinateIsClear && positionFreeTest < 10000000){
 		positionFreeTest++;
 		testx = getRndNum(maxx-1);
 		testy = getRndNum(maxy-1);
 		coordinateIsClear = checkIfCoordinatesAreClear(&testx, &testy);
 	}
-	setBeingDefaults(beingToGiveLife,&testx,&testy,myColor);
 
 	// Initial placing of being.
-	beingToPrint(beingToGiveLife);
+	if(coordinateIsClear){
 
-	// return false if position is not found
-	if(positionFreeTest >= 10000000)
-		return 0;
-	else
-		return 1;
+		Being *beingToGiveLife = malloc(sizeof(Being));
+		if(beingToGiveLife == NULL){
+			endwin();
+			printf("\nError creating a new being.\n");
+			exit(1);
+		}
+		setBeingDefaults(beingToGiveLife,&testx,&testy,myColor);
+
+		// find last being in linked list
+		if(beingsCursor!=NULL){
+			while(beingsCursor->next != NULL)
+				beingsCursor = beingsCursor->next;
+			beingsCursor->next = beingToGiveLife;  // add new being in the end of the list
+		}
+		else  // if first being
+			beingsCursor = beingToGiveLife;
+
+		beingToPrint(beingToGiveLife);
+	}
+	else{  // if no place to spawn being is found
+		endwin();
+		printf("\nError: No space for all beings to spawn. Try a lower number or make the terminal window larger.\n");
+		exit(1);
+	}
 }
 
 
 void movement(Being *beingToTurn)
 {
 	// only move if alive and not resting or fighting
-	if(beingToTurn->alive==TRUE && !beingToTurn->resting && !beingToTurn->fighting){
+	if(!beingToTurn->resting && !beingToTurn->fighting){
 		switch(beingToTurn->myHeading){
 			case UP:
 				beingToTurn->posy--;
@@ -110,10 +129,7 @@ void movement(Being *beingToTurn)
 
 void turnBeing(Being *beingToTurn, Attackposition *attackposition)
 {
-
-	if(!beingToTurn->alive)  // do nothing if being is not alive
-		return;
-	else if(beingToTurn->isHit){  // skip turn if hit (stunned for 1 turn)
+	if(beingToTurn->isHit){  // skip turn if hit (stunned for 1 turn)
 		beingToTurn->isHit = FALSE;
 		return;
 	}
@@ -133,28 +149,3 @@ void turnBeing(Being *beingToTurn, Attackposition *attackposition)
 	// Print new position.
 	beingToPrint(beingToTurn);
 }
-
-
-//void strikeBeingOnCoordinates(const int *x, const int *y){
-//	if(getRndNum(3)==3){  // 1/3 chance of successful attack
-//		beingToStrike->hitpoints--;
-//		attron(COLOR_PAIR(beingToPrint->myColor));
-//		mvprintw(beingToStrike->posy,beingToStrike->posx,"*");
-//		attroff(COLOR_PAIR(beingToPrint->myColor));
-//	}
-//}
-
-
-//bool isEnemy(Being *beingPerspective, const int *targetx, const int *targety)
-//{
-//	char targetobject;
-//	char targetcolor;
-//	targetobject = mvinch(*targety,*targetx) & A_CHARTEXT;  // Get target object.
-//	targetcolor = mvinch(*targety,*targetx) & A_COLOR;  	// Get target color.
-
-	// Friend or foe
-//	if(targetobject == '*' && targetcolor != beingPerspective->myColor)  //being with different color
-//		return TRUE;
-//	else
-//		return FALSE;
-//}

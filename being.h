@@ -25,7 +25,7 @@ typedef struct being{
 	int posx;
 	int posy;
 	int hitpoints;
-	bool alive;
+	//bool alive;
 	Heading myHeading;
 	//Sight peek;
 	Sight obstacles;
@@ -33,6 +33,7 @@ typedef struct being{
 	MyColor myColor;
 	bool fighting;
 	bool isHit;
+	struct being *next;
 } Being;
 
 
@@ -40,7 +41,7 @@ typedef struct being{
 
 void setBeingDefaults(Being *beingToGiveLife, const int *x, const int *y, const MyColor *myColor);
 void beingToPrint(const Being *beingToPrint);
-int spawnBeing(Being *beingToGiveLife, const int *beingNbr, const MyColor *myColor);
+void spawnBeing(Being *beingsCursor, const MyColor *myColor);
 void movement(Being *beingToTurn);
 void turnBeing(Being *beingToTurn, Attackposition *attackposition);
 //bool isEnemy(Being *beingMe, const int *targetx, const int *targety);
