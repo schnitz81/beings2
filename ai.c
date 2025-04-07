@@ -189,7 +189,7 @@ void decision_peaceful(Being *beingToTurn)
 					else if(i<13)
 						beingToTurn->myHeading=UP;
 				}
-				else if(beingToTurn->myColor==BLUE){
+				else if(beingToTurn->myColor==YELLOW){
 					if(i<5)
 						beingToTurn->myHeading=DOWNRIGHT;
 					else if(i<9)

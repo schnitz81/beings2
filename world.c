@@ -137,8 +137,8 @@ unsigned int getNbrOfBeings(const MyColor *myColor)
 		attron(A_BOLD);
 		if(*myColor == GREEN)
 			printw("green");
-		else if(*myColor == BLUE)
-			printw("blue");
+		else if(*myColor == YELLOW)
+			printw("yellow");
 		attroff(A_BOLD);
 		printw(" beings:            ");
 		getyx(stdscr,y,x);  // Get current cursor position.
@@ -231,7 +231,7 @@ void runWorld()
 	unsigned int nbrOfGreenBeings, nbrOfBlueBeings;
 	int i, simulationSpeed;
 	Attackposition attackposition;
-	MyColor greenBeingColor, blueBeingColor;
+	MyColor greenBeingColor, yellowBeingColor;
 	gamemode = FREEROAM;
 	attackposition.posy = 0;
 	attackposition.posx = 0;
@@ -249,16 +249,16 @@ void runWorld()
 		refresh();
 		usleep(300);  // delay
 	}
-	blueBeingColor = BLUE;
-	nbrOfBlueBeings = getNbrOfBeings(&blueBeingColor);
-	Being *blueBeingsHead = malloc(sizeof(Being));
-	Being *blueBeingsCursor = malloc(sizeof(Being));
-	Being *blueBeingsPrev = malloc(sizeof(Being));
+	yellowBeingColor = YELLOW;
+	nbrOfBlueBeings = getNbrOfBeings(&yellowBeingColor);
+	Being *yellowBeingsHead = malloc(sizeof(Being));
+	Being *yellowBeingsCursor = malloc(sizeof(Being));
+	Being *yellowBeingsPrev = malloc(sizeof(Being));
 
-	blueBeingsCursor = blueBeingsHead;
+	yellowBeingsCursor = yellowBeingsHead;
 
 	for(i=0;i<nbrOfBlueBeings;i++){
-		spawnBeing(blueBeingsCursor, &blueBeingColor);
+		spawnBeing(yellowBeingsCursor, &yellowBeingColor);
 		refresh();
 		usleep(300);  // delay
 	}
@@ -277,25 +277,25 @@ void runWorld()
 		while(greenBeingsCursor->next!=NULL){
 			turnBeing(greenBeingsCursor->next, &attackposition);
 			greenBeingsCursor = greenBeingsCursor->next;
-			blueBeingsCursor = blueBeingsHead;
-			blueBeingsPrev = blueBeingsCursor;  // reset prev pointer
+			yellowBeingsCursor = yellowBeingsHead;
+			yellowBeingsPrev = yellowBeingsCursor;  // reset prev pointer
 			beingDestroyed = FALSE;
-			while(blueBeingsCursor->next!=NULL){  // compare all opponents against attack coordinates
-				blueBeingsCursor = blueBeingsCursor->next;
-				beingDestroyed = hitHandleBeing(blueBeingsPrev, blueBeingsCursor, &attackposition);
+			while(yellowBeingsCursor->next!=NULL){  // compare all opponents against attack coordinates
+				yellowBeingsCursor = yellowBeingsCursor->next;
+				beingDestroyed = hitHandleBeing(yellowBeingsPrev, yellowBeingsCursor, &attackposition);
 				if(beingDestroyed)
 					break;
-				blueBeingsPrev = blueBeingsCursor;
+				yellowBeingsPrev = yellowBeingsCursor;
 			}
 			// reset attack coordinates after every failed attack
 			attackposition.posy = 0;
 			attackposition.posx = 0;
 		}
 
-		blueBeingsCursor = blueBeingsHead;
-		while(blueBeingsCursor->next!=NULL){
-			turnBeing(blueBeingsCursor->next, &attackposition);
-			blueBeingsCursor = blueBeingsCursor->next;
+		yellowBeingsCursor = yellowBeingsHead;
+		while(yellowBeingsCursor->next!=NULL){
+			turnBeing(yellowBeingsCursor->next, &attackposition);
+			yellowBeingsCursor = yellowBeingsCursor->next;
 			// handle attack hits on all enemy beings
 			greenBeingsCursor = greenBeingsHead;
 			greenBeingsPrev = greenBeingsCursor;  // reset prev pointer
@@ -333,9 +333,9 @@ void runWorld()
 	//free(greenBeingsHead);
 	//free(greenBeingsCursor);
 	//free(greenBeingsPrev);
-	//free(blueBeingsHead);
-	//free(blueBeingsCursor);
-	//free(blueBeingsPrev);
+	//free(yellowBeingsHead);
+	//free(yellowBeingsCursor);
+	//free(yellowBeingsPrev);
 	getch();
 	endwin();
 }

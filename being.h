@@ -10,7 +10,7 @@ typedef struct attack_coordinates{
 
 typedef enum heading { UNDERVALUE2 = -2, UNDERVALUE1, UP, UPRIGHT, RIGHT, DOWNRIGHT, DOWN, DOWNLEFT, LEFT, UPLEFT, OVERVALUE1, OVERVALUE2 } Heading;
 typedef enum object { NONE, TEAMBEING, FIGHTINGBEING, ENEMYBEING, DAMAGEDBEING, DEADBEING, FENCE } Object;
-typedef enum myColor { GREEN = 2, BLUE = 4 } MyColor;
+typedef enum myColor { GREEN = 2, YELLOW = 3 } MyColor;
 //typedef enum fightmode { NONVIOLENT, FIGHTING } Fightmode; 
 typedef struct sight {
 	 Object leftnear;
