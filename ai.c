@@ -182,19 +182,19 @@ void decision_peaceful(Being *beingToTurn)
 				break;
 			case REGROUP:
 				if(beingToTurn->myColor==GREEN){
-					if(i<5)
+					if(i<4)
 						beingToTurn->myHeading=UPLEFT;
-					else if(i<9)
+					else if(i<7)
 						beingToTurn->myHeading=LEFT;
-					else if(i<13)
+					else if(i<10)
 						beingToTurn->myHeading=UP;
 				}
 				else if(beingToTurn->myColor==YELLOW){
-					if(i<5)
+					if(i<4)
 						beingToTurn->myHeading=DOWNRIGHT;
-					else if(i<9)
+					else if(i<7)
 						beingToTurn->myHeading=RIGHT;
-					else if(i<13)
+					else if(i<10)
 						beingToTurn->myHeading=DOWN;
 				}
 				break;
@@ -291,7 +291,7 @@ void decision_attack(Being *beingToTurn, Attackposition *attackposition)
 	look_ahead(beingToTurn);
 
 	bool firstCheck = TRUE;
-	
+
 	int loop=0;
 
 	// Keep deciding until the coast is clear.
@@ -374,7 +374,7 @@ void decision_attack(Being *beingToTurn, Attackposition *attackposition)
 			beingToTurn->myHeading--;
 		else if(beingToTurn->obstacles.rightfar==ENEMYBEING && beingToTurn->obstacles.rightnear==NONE)
 			beingToTurn->myHeading++;
-		
+
 		// Fighting spotted far logic
 		else if((beingToTurn->obstacles.leftfar==FIGHTINGBEING || beingToTurn->obstacles.leftfar==DAMAGEDBEING) && beingToTurn->obstacles.leftnear==NONE)
 			beingToTurn->myHeading--;
@@ -431,4 +431,3 @@ void decision(Being *beingToTurn, Attackposition *attackposition)
 			break;
 	}
 }
-
