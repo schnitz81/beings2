@@ -8,7 +8,7 @@ if ! [ -e beings ]; then
 	echo "success!";
 
 	echo -n "Checking curses..."
-	if [[ ! -n $(find /usr/* -name 'ncurses.h') ]]; then
+	if [[ ! -n $(find /usr/include -name 'ncurses.h') ]]; then
 		echo -e "failed!\n\nncurses.h not found. Make sure ncurses package is installed.\n"
 		exit 1
 	fi

@@ -18,7 +18,7 @@ extern int maxx;
 void placeObstacles();
 void buildWorld();
 unsigned int getMaxNbrOfBeings();
-unsigned int getNbrOfBeings();
+unsigned int getNbrOfBeings(const MyColor *myColor);
 //void spawnBeings(Being *beingsCursor, const unsigned int *nbrOfBeings, const MyColor *beingColor);
 int setSimulationSpeed();
 bool hitHandleBeing(Being *beingPrev, Being *beingToHitcheckCursor, Attackposition *attackposition);
