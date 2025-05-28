@@ -4,7 +4,7 @@
 
 
 int getRndNum(const int nmbOfTurnouts) // Function to return a random number.
-{       
-	int rand_nbr = (rand()%nmbOfTurnouts+1); 
+{
+	int rand_nbr = (rand()%nmbOfTurnouts+1);
 	return rand_nbr;
 }

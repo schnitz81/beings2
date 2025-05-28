@@ -1,20 +1,20 @@
 if ! [ -e beings ]; then
-	echo "No executable found. Preparing to build..."; sleep .6
-	echo -n "Checking gcc..."; sleep .4
+	echo "No executable found. Preparing to build..." 
+	echo -n "Checking gcc..."
 	if [ -z "$(which gcc)" ]; then
 		echo -e "failed!\n\nMake sure gcc is installed.\n"
 		exit 1
 	fi
-	echo "success!"; sleep .4
+	echo "success!";
 
-	echo -n "Checking curses..."; sleep .4
-	if [[ ! -n $(find /usr/* -name 'curses.h') ]]; then
-		echo -e "failed!\n\ncurses.h not found. Make sure curses (most often ncurses) is installed.\n"
+	echo -n "Checking curses..."
+	if [[ ! -n $(find /usr/include -name 'ncurses.h') ]]; then
+		echo -e "failed!\n\nncurses.h not found. Make sure ncurses package is installed.\n"
 		exit 1
 	fi
-	echo "success!"; sleep .4
+	echo "success!"
 
-    echo "Proceeding to build executable..."; sleep .6
+    echo "Proceeding to build executable..."
 
 	echo 'Building...'
 	gcc -Wfatal-errors -Wall -c main.c &&
@@ -22,19 +22,16 @@ if ! [ -e beings ]; then
 	gcc -Wfatal-errors -Wall -c ai.c &&
 	gcc -Wfatal-errors -Wall -c event.c &&
 	gcc -Wfatal-errors -Wall -c being.c &&
-	gcc -Wfatal-errors -o beings main.o world.o ai.o event.o being.o -lcurses -ltinfo 
+	gcc -Wfatal-errors -o beings main.o world.o ai.o event.o being.o -lncurses -ltinfo 
 
 	if [ $? -eq 0 ]; then
-		echo "Build successful. Starting executable..."; sleep 1
+		echo "Build successful. Starting executable..."
 		./beings
 	else
 		echo "Build failed. Unable to start."
 	fi
 	
 else
-	echo -e "\nExecutable found. Starting..."; sleep 1
+	echo -e "\nExecutable found. Starting..."
 	./beings
 fi
-
-
-
